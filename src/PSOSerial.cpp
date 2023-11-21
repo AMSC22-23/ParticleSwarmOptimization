@@ -1,6 +1,7 @@
 #include <iostream>
 #include <limits>
 #include <random>
+#include <fstream>
 #include "PSO.hpp"
 
 void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective_function,
@@ -14,10 +15,10 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
     std::vector<Particle> swarm;
 
     //Constant inertia weight
-    double ciw = 0.5;
+    const double ciw = 0.5;
     //Acceleration constants
-    double acceleration1 = 2.0;
-    double acceleration2 = 2.0;
+    const double c1 = 2.0;
+    const double c2 = 2.0;
 
     // Initialize particles
     for (int i = 0; i < num_particles; ++i) {
@@ -28,20 +29,28 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
     double global_best_sol = std::numeric_limits<double>::infinity();
     std::vector<double> global_best_position(dimensions);
 
+
     // Main loop
     for (int iter = 0; iter < max_iter; ++iter) {
         for (auto& particle : swarm) {
             double value = objective_function(particle.position);
 
             // Update velocity
+            // v(t+1) = ciw * v(t) + c1 * r1 * (local_best - x(t)) + c2 * r2 * (global_best - x(t))
             for (int i = 0; i < dimensions; ++i) {
                 std::uniform_real_distribution<> dis(0, 1);
                 double r1 = dis(gen);
                 double r2 = dis(gen);
-                particle.velocity[i] = ciw * particle.velocity[i] + acceleration1 * r1 * (particle.best_position[i] - particle.position[i]) + acceleration2 * r2 * (global_best_position[i] - particle.position[i]);
+                particle.velocity[i] = ciw * particle.velocity[i] + c1 * r1 * (particle.best_position[i] - particle.position[i]) + c2 * r2 * (global_best_position[i] - particle.position[i]);
+                //                     \________________________/    \_________________________________________________________/  \_________________________________________________________/ 
+                //                                |                                           |                                                           |
+                //                          Velocity update                               Local best update                                          Global best update
+                //                         (inertia component)                          (cognitive component)                                        (social component)
             }
 
-            // Update position
+            // Update position 
+            // x(t+1) = x(t) + v(t+1)
+            //(TODO: add velocity clamping/constriction coefficient methods)
             for (int i = 0; i < dimensions; ++i) {
                 particle.position[i] += particle.velocity[i];
                 if (particle.position[i] < bounds[i].first) {
@@ -66,8 +75,9 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
         }
     }
     // Output the result
-    std::cout << "Best Value: " << global_best_sol << std::endl;
-    std::cout << "Best Position: ";
+    std::cout << "-------------------------Solution-------------------------" << std::endl;
+    std::cout << "Best Value     : " << global_best_sol << std::endl;
+    std::cout << "Best Position  : ";
     for (auto& val: global_best_position) { std::cout << val << " ";}
     std::cout << std::endl;
 }

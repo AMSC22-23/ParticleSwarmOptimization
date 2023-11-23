@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <chrono>
 #include <memory>
@@ -8,6 +9,15 @@
 int main() {
 
     using namespace std::chrono;
+
+    const int num_particles = 3;
+    const int max_iter = 100;
+
+    //CSV file for each particle to store its position and value data at each iteration
+    for (int i = 0; i < num_particles; ++i) {
+        std::string filename = "../data/particle_" + std::to_string(i) + "_pos.csv";
+        std::ofstream file(filename);
+    }
 
     auto objective_function = [](const std::vector<double>& position) -> double {
         double x = position[0];
@@ -24,11 +34,11 @@ int main() {
 
     PSO_serial algorithm; 
 
-    //Execution time profiling
+    //Execution time profiling (TODO: for the moment biased by the time spent writting in CSV files -> writting in csv outside of PSO method )
     const auto t0 = high_resolution_clock::now();
     
     // Execute PSO(function , bounds of each dim , num particles , maxiter)
-    algorithm.pso(objective_function, bounds, 3, 100);
+    algorithm.pso(objective_function, bounds, num_particles, max_iter);
 
     const auto t1 = high_resolution_clock::now();
     const auto dt = duration_cast<milliseconds>(t1 - t0).count();

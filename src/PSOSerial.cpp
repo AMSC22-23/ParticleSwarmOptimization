@@ -29,9 +29,12 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
     double global_best_sol = std::numeric_limits<double>::infinity();
     std::vector<double> global_best_position(dimensions);
 
-
     // Main loop
     for (int iter = 0; iter < max_iter; ++iter) {
+
+        //Counter of particles
+        int particle_count = 0;
+
         for (auto& particle : swarm) {
             double value = objective_function(particle.position);
 
@@ -72,6 +75,16 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
                 global_best_sol = value;
                 global_best_position = particle.position;
             }
+
+            //Write particle's position in the corresponding CSV
+            // Comment out for accurate time profiling
+            std::string filename = "../data/particle_" + std::to_string(particle_count) + "_pos.csv";
+            std::ofstream file(filename, std::ios_base::app);
+            for (auto& pos: particle.position) { file << pos << ",";}
+            file << value;
+            file << std::endl;
+
+            particle_count++;
         }
     }
     // Output the result

@@ -1,23 +1,10 @@
 import os
 import glob
-import shutil
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-from matplotlib import cm
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 f = lambda x, y: (1-x)**2 + 100*(y-x**2)**2
-
-# Plot the 2D and 3D surface of the function f; given a: 
-#  - function f 
-#  - title of the plot
-#  - x and y limits  
-#  - path to save the plot
-
-# Onto this surface plot the position of each particle at each iteration
-# One plot for each iteration containing all the particles
 
 def plot_surface_2d(f, x_lim, y_lim, iter, title,path_to_save, csv_files):
     for i in range(iter):
@@ -44,14 +31,14 @@ def plot_surface_2d(f, x_lim, y_lim, iter, title,path_to_save, csv_files):
         plt.savefig(path_to_save+"frame_" + str(i) +".png")
         plt.close()
 
-# f, x_lim, y_lim, nb iter , title , path to save , path to particle data
-plot_surface_2d(f, [10,-10], [10,-10], 100,"Rosenbrock function", "visualization/frames/", "data/")
-
-
 def gif(folder, out_path):
     files = os.path.join(folder, '*.png')
     img, *imgs = [Image.open(f) for f in sorted(glob.glob(files))]
     img.save(fp=out_path, format='GIF', append_images=imgs,
              save_all=True, duration=200, loop=0)
 
+# f, x_lim, y_lim, nb iter , title , path to save , path to particle data
+plot_surface_2d(f, [10,-10], [10,-10], 100,"Rosenbrock function", "visualization/frames/", "data/")
+
+# input folder, output folder 
 gif("visualization/frames/", "visualization/animation.gif")

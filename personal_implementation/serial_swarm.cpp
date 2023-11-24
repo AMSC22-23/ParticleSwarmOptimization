@@ -41,7 +41,7 @@ std::vector<elem_t> global_best(const std::vector<Particle>& particles) {
     return initial_best_position;
 }
 
-void local_best(Particle& particle, const double& a, const double& b) {
+void local_best(Particle& particle, const elem_t& a, const elem_t& b) {
     // Computing best position for each particle during each iteration
     particle.value = Rosenbrock2D(particle.position, a, b);
 
@@ -51,7 +51,7 @@ void local_best(Particle& particle, const double& a, const double& b) {
     }
 }
 
-std::vector<Particle> PSO_init(const size_t& num_particles, const double& a, const double& b) {
+std::vector<Particle> PSO_init(const size_t& num_particles, const elem_t& a, const elem_t& b) {
     using elem_t = double;
 
     // Bounds for p_dimensionality = 2
@@ -92,23 +92,20 @@ std::vector<Particle> PSO_init(const size_t& num_particles, const double& a, con
 }
 
 int main() {
-
-    using elem_t = double;
-
     // Rosenbrock function parameters
     elem_t a = 1.0;
     elem_t b = 100.0;
 
     // PSO parameters
     // size_t p_dimensionality = 2; // problem dimensionality --> to be addressed later
-    size_t num_particles = 10;
-    size_t max_iter = 100;
+    size_t num_particles = 20;
+    size_t max_iter = 500;
     elem_t w = 0.5;
-    elem_t c1 = 0.2;
-    elem_t c2 = 0.8;
+    elem_t c1 = 2;
+    elem_t c2 = 2;
 
     std::cout << "===============================================" << std::endl;
-    
+
     // PSO initialization
     std::vector<Particle> particles = PSO_init(num_particles, a, b);
 

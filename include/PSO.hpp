@@ -21,5 +21,7 @@ public:
             const std::vector<std::pair<double, double>>& bounds,
             int num_particles,
             int max_iter) override;
+
+
 };
 #endif

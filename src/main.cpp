@@ -6,12 +6,23 @@
 #include "Particle.hpp"
 #include "PSO.hpp"
 
+template <typename T>
+T Ackley(const std::vector<T>& position) { //global min of 0 at (0,0)
+    T x = position[0];
+    T y = position[1];
+    T f = -20*exp(-0.2*sqrt(0.5*(std::pow(x,2)+std::pow(y,2))))-exp(0.5*(cos(2*M_PI*x)+cos(2*M_PI*y)))+exp(1)+20;
+    return f;
+};
+
+double (*objective_function)(const std::vector<double>&) = Ackley<double>;
+
+
 int main() {
 
     using namespace std::chrono;
 
-    const int num_particles = 3;
-    const int max_iter = 100;
+    const int num_particles = 10;
+    const int max_iter = 200;
 
     //CSV file for each particle to store its position and value data at each iteration
     for (int i = 0; i < num_particles; ++i) {
@@ -19,18 +30,8 @@ int main() {
         std::ofstream file(filename);
     }
 
-    auto objective_function = [](const std::vector<double>& position) -> double {
-        double x = position[0];
-        double y = position[1];
-
-        // 2D Rosenbrock function w/ global min of 0 at (1,1) 
-        //f(x,y) = (1-x)^2 + 100*(y-x^2)^2
-        double f = std::pow(1-x,2)+100*std::pow(y-std::pow(x,2),2);
-        return f;
-    };  
-
     // Define the bounds for each dimension
-    std::vector<std::pair<double, double>> bounds = {{-10, 10}, {-10, 10}}; // 2 dimensions
+    std::vector<std::pair<double, double>> bounds = {{-30, 30}, {-30, 30}}; // 2 dimensions
 
     PSO_serial algorithm; 
 

@@ -69,7 +69,7 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
                 global_best_position = particle.position;
                 global_best_sol = particle.value;
             }
-
+/* 
             //Write particle's position in the corresponding CSV
             // Comment out for accurate time profiling
             std::string filename = "../data/particle_" + std::to_string(particle_count) + "_pos.csv";
@@ -77,7 +77,7 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
             for (auto& pos: particle.position) { file << pos << ",";}
             file << particle.value;
             file << std::endl;
-
+ */
             particle_count++;
         }
     }

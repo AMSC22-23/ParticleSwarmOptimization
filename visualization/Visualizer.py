@@ -42,7 +42,7 @@ def gif(folder, out_path):
     files = os.path.join(folder, '*.png')
     img, *imgs = [Image.open(file) for file in sorted(glob.glob(files))]
     img.save(fp=out_path, format='GIF', append_images=imgs,
-             save_all=True, duration=300, loop=1)
+             save_all=True, duration=150, loop=0)
 
 # x_lim, y_lim , title , path to save , path to particle data
 # plot_surface_2d([30, -30], [30,-30],"Ackley function", "visualization/frames/", "data/")

@@ -44,13 +44,25 @@ def gif(folder, out_path):
     img.save(fp=out_path, format='GIF', append_images=imgs,
              save_all=True, duration=150, loop=0)
 
+def global_best(path):
+    data = np.genfromtxt(path, delimiter='/n')
+    plt.plot(data)
+    plt.xlabel("Iteration")
+    plt.ylabel("Global best solution")
+    plt.show()
+    plt.savefig("visualization/global_best.png")
+    plt.close()
+
+global_best("data/global_best_sol_history.csv")
+
 # x_lim, y_lim , title , path to save , path to particle data
 # plot_surface_2d([30, -30], [30,-30],"Ackley function", "visualization/frames/", "data/")
 
-if __name__ == '__main__':
-    args = [(i, [30, -30], [30,-30], "Ackley function", "visualization/frames/", "data/") for i in range(200)]
+""" if __name__ == '__main__':
+    args = [(i, [30, -30], [30,-30], "Ackley function", "visualization/frames/", "data/particle_data/") for i in range(200)]
     with Pool() as p:
         p.map(helper, args)
 
 # input folder, output folder 
 gif("visualization/frames/", "visualization/animation.gif")
+ """

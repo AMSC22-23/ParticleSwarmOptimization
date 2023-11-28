@@ -27,19 +27,16 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
     }
 
     std::vector<double> global_best_position = swarm[best_particle_index].position;   // Initialize global best position
-    double global_best_sol = objective_function(global_best_position);// Initialize global best solution
+    double global_best_sol = objective_function(global_best_position);                // Initialize global best solution
+
+    global_best_sol_history.push_back(global_best_sol);                               // Store initial global best solution
+    global_best_positions_history.push_back(global_best_position);                    // Store initial global best position
 
     // Main loop
     for (int iter = 0; iter < max_iter; ++iter) {
-/*  
-        std::cout << "---------------------------------------------------------------------------------" << std::endl;
-        std::cout << "It: " << iter << "    GBP: ("<< global_best_position[0]  <<","<<  global_best_position[1] << ")"<<std::endl;
-        std::cout << "GBV: " << global_best_sol << std::endl;
- */
-        int particle_count = 0; // Particle counter
+        int particle_count = 0;
 
         for (auto& particle : swarm) {
-
             // Update velocity & position
             for (int i = 0; i < dimensions; ++i) {
 
@@ -53,7 +50,6 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
                 particle.velocity[i] = ciw * particle.velocity[i] 
                                         + c1 * r1[i] * (particle.best_position[i] - particle.position[i])
                                         + c2 * r2[i] * (global_best_position[i] - particle.position[i]);
-                
                 particle.position[i] += particle.velocity[i];
             }
             particle.value = objective_function(particle.position);
@@ -69,17 +65,19 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
                 global_best_position = particle.position;
                 global_best_sol = particle.value;
             }
-/* 
-            //Write particle's position in the corresponding CSV
+
+/*          //Write particle's position in the corresponding CSV
             // Comment out for accurate time profiling
-            std::string filename = "../data/particle_" + std::to_string(particle_count) + "_pos.csv";
+            std::string filename = "../data/particle_data/particle_" + std::to_string(particle_count) + "_pos.csv";
             std::ofstream file(filename, std::ios_base::app);
             for (auto& pos: particle.position) { file << pos << ",";}
             file << particle.value;
-            file << std::endl;
- */
+            file << std::endl; */
+            
             particle_count++;
         }
+        global_best_sol_history.push_back(global_best_sol);
+        global_best_positions_history.push_back(global_best_position);
     }
     // Output the result
     std::cout << "-------------------------Solution-------------------------" << std::endl;

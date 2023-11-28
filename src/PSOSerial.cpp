@@ -6,12 +6,9 @@
 
 
 void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective_function,
-        const std::vector<std::pair<double,double>> &bounds, int num_particles, int max_iter) 
+        const std::vector<std::pair<double,double>> &bounds, int num_particles, int max_iter,
+        const double ciw,const double c1,const double c2) 
     {
-    //PSO PARAMS
-    const double ciw = 0.5;      //Constant inertia weight
-    const double c1 = 2.0;       //Acceleration constants
-    const double c2 = 2.0;
 
     std::vector<Particle> swarm;                                      // Initialize Swarm
 
@@ -70,10 +67,4 @@ void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective
         global_best_sol_history.push_back(global_best_sol);
         global_best_positions_history.push_back(global_best_position);
     }
-    // Output the result
-    std::cout << "-------------------------Solution-------------------------" << std::endl;
-    std::cout << "Best Value     : " << global_best_sol << std::endl;
-    std::cout << "Best Position  : ";
-    for (auto& val: global_best_position) { std::cout << val << " ";}
-    std::cout << std::endl;
 }

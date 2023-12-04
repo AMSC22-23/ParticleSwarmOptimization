@@ -5,6 +5,8 @@
 #include "Particle.hpp"
 #include "PSO.hpp"
 
+using namespace std;
+
 int main() {
 
     using namespace std::chrono;

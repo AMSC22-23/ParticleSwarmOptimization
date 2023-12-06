@@ -6,28 +6,13 @@
 
 
 void PSO_serial::pso(std::function<double(const std::vector<double>&)> objective_function,
-        const std::vector<std::pair<double,double>> &bounds, int num_particles, int max_iter,
-        const double ciw,const double c1,const double c2) 
+
+        const std::vector<std::pair<double,double>> &bounds, int num_particles, int max_ter,
+
+        const double inertiaWeight, const double c1, const double c2) 
     {
 
-    std::vector<Particle> swarm;                                      // Initialize Swarm
-
-    const int dimensions = bounds.size();
-    int best_particle_index = 0;
-    for (int i = 0; i < num_particles; ++i) {
-        swarm.push_back(Particle(dimensions, bounds));                // Initialize particles
-        swarm[i].value = objective_function(swarm[i].position);       // Initilize value of each particle
-        swarm[i].best_sol = swarm[i].value;                           // Initialize best sol of each particle
-        if (swarm[i].value < swarm[best_particle_index].value) {
-            best_particle_index = i;
-        }
-    }
-
-    std::vector<double> global_best_position = swarm[best_particle_index].position;   // Initialize global best position
-    double global_best_sol = objective_function(global_best_position);                // Initialize global best solution
-
-    global_best_sol_history.push_back(global_best_sol);                               // Store initial global best solution
-    global_best_positions_history.push_back(global_best_position);                    // Store initial global best position
+ 
 
     // Main loop
     for (int iter = 0; iter < max_iter; ++iter) {

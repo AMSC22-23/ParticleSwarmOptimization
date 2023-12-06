@@ -1,11 +1,14 @@
 #include "ObjectiveFunction.hpp"
 #include <cmath>
+#include <string>
+
+using namespace std;
 
 /*
 2D Ackley function:
 Minimun at f(0,0) = 0
 */
-double ObjectiveFunction::Ackley(const std::vector<double>& position) {
+double ObjectiveFunction::Ackley(double* position, int dim) {
     double x = position[0];
     double y = position[1];
     double f = -20*exp(-0.2*sqrt(0.5*(std::pow(x,2)+std::pow(y,2))))-exp(0.5*(cos(2*M_PI*x)+cos(2*M_PI*y)))+exp(1)+20;
@@ -16,9 +19,12 @@ double ObjectiveFunction::Ackley(const std::vector<double>& position) {
 N dimensional Rosenbrock function:
 Minimun at f(1,1,...,1) = 0
 */
-double ObjectiveFunction::Rosenbrock(const std::vector<double>& position) {
-    double f = 0;
-    for (std::vector<double>::size_type i = 0; i < position.size()-1; ++i) {
+double ObjectiveFunction::Rosenbrock(double* position, int dim) {
+   //search space
+
+
+    double f;
+    for (size_t i = 0; i < dim-1; ++i) {
         f += 100*std::pow(position[i+1]-std::pow(position[i],2),2)+std::pow(1-position[i],2); 
     }
     return f;
@@ -28,10 +34,53 @@ double ObjectiveFunction::Rosenbrock(const std::vector<double>& position) {
 N dimensional Rastrigin function:
 Minimun at f(0,0,...,0) = 0
 */
-double ObjectiveFunction::Rastrigin(const std::vector<double>& position) {
-    double f = 10*position.size();
-    for (std::vector<double>::size_type i = 0; i < position.size(); ++i) {
+double ObjectiveFunction::Rastrigin(double* position, int dim) {
+    double f;
+    for (size_t i = 0; i < dim; ++i) {
         f += std::pow(position[i],2)-10*cos(2*M_PI*position[i]);
     }
     return f;
 };
+
+double ObjectiveFunction::SphereOne(double *position, int dim) {
+    double result;
+    for(size_t i = 0; i < dim ; i++){
+        result += pow(position[i],2);
+    }
+    return result;
+}
+
+// Objective function (here it minimizes a simple quadratic function)
+double ObjectiveFunction::Quadratic_function(double *position, int dim) {
+    double result;
+    for (size_t i = 0; i < dim; i++) {
+        result += (i+1)*10*pow(position[i],2) + (i+1)*20*pow(position[i],2);
+    }
+    return result;
+}
+
+std::pair<double, double>* ObjectiveFunction::get_bounds(std::string objFunction, int dim) {
+    std::pair<double, double>* bounds = new std::pair<double, double>[dim];
+    if (objFunction == "Rosenbrock") {
+        for (int i = 0; i < dim; ++i) {
+            bounds[i] = std::make_pair(-30, 30);
+        }
+    } else if (objFunction == "Ackley") {
+        for (int i = 0; i < dim; ++i) {
+            bounds[i] = std::make_pair(-5, 10);
+        }
+    } else if (objFunction == "Rastrigin") {
+        for (int i = 0; i < dim; ++i) {
+            bounds[i] = std::make_pair(-5.12, 5.12);
+        }
+    } else if (objFunction == "SphereOne") {
+        for (int i = 0; i < dim; ++i) {
+            bounds[i] = std::make_pair(-100, 100);
+        }
+    } else if (objFunction == "Quadratic") {
+        for (int i = 0; i < dim; ++i) {
+            bounds[i] = std::make_pair(-100, 100);
+        }
+    }
+    return bounds;
+}

@@ -2,12 +2,15 @@
 #define OBJECTIVEFUNCTION_HPP
 
 #include <vector>
-class ObjectiveFunction {
-public:
-    static double Ackley(const std::vector<double>& position);
-    static double Rosenbrock(const std::vector<double>& position);
-    static double Rastrigin(const std::vector<double>& position);
-};
+namespace ObjectiveFunction {
 
+    double Ackley(double* position, int dim);
+    double Rosenbrock(double* position, int dim);
+    double Rastrigin(double* position, int dim);
+    double Quadratic_function(double *position, int dim);
+    double SphereOne(double *position, int dim);
+
+    std::pair<double, double>* ObjectiveFunction::get_bounds(std::string objFunction, int dim);
+}
 
 #endif // OBJECTIVEFUNCTION_HPP

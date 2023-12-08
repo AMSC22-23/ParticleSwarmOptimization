@@ -1,24 +1,6 @@
-/*
 #ifndef PARTICLE_HPP
 #define PARTICLE_HPP
 
-#include <vector>
-
-class Particle {
-public:
-    std::vector<double> position;
-    std::vector<double> velocity;
-    std::vector<double> best_position;
-    double value; 
-    double best_sol;
-
-    Particle(int dimensions, const std::vector<std::pair<double, double>>& bounds);
-};
-#endif
-*/
-
-#include <iostream>
-#include <string>
 #include <array>
 #include <cmath>
 #include <cstdlib>
@@ -27,67 +9,32 @@ public:
 
 using namespace std;
 
-#ifndef PARTICLE_HPP_
-
-
-#define PARTICLE_HPP_
-
 class Particle {
-
-private:
-    // Private member variables
-
-    // Dimension of the particle.
-    int dimensions;
-
-    // Position array :
-    double* x;
-    // Velocity array :
-    double* v;
-    // Best position array :
-    double* x_best;
-
-    // Fitness value for optimization :
-    double fitness;
-    // Best fitness value for optimization :
-    double bestfitness;
-
 public:
+    int dimensions;        // dim of problem
+    double* position;      // position of particle
+    double* velocity;      // velocity of particle
+    double* best_position; // best position of particle
+    double value;          // value of particle at current position given a function
+    double best_value;     // best value of particle given a function
 
-    // Constructor to initialize with dynamic arrays
-    Particle(int dimensions);
+    Particle(int dimensions); // Constructor 
+    ~Particle();              // Destructor
 
-    // Destructor to free the allocated memory
-    ~Particle();
+    /* Setter methods */
+    void setPosition(int index, double val);
+    void setVelocity(int index, double val);
+    void setBestPosition(int index, double val);
+    void setValue(double value);
+    void setBestValue(double best_value);
 
-    //Setter methods to access individual elements at specific indices
-    void setPositionAtIndex(int index, double value);
-
-    void setVelocityAtIndex(int index, double value);
-
-    void setBestPositionAtIndex(int index, double value);
-
-    void setFitness(double fitnessVal);
-
-    void setBestFitness(double bestfitnessVal);
-
-    // Getter methods to access individual elements at specific indices
-
-    double getPosAtIndex(int index) const;
-
-    double getVelocityAtIndex(int index) const;
-
-    double getBestPosAtIndex(int index) const;
-
-    double getFitness();
-
-    double getBestFitness();
-
+    /* Getter methods */
+    double getSinglePosition(int index) const;
+    double getVelocity(int index) const;
+    double getBestPos(int index) const;
+    double getValue();
+    double getBestValue();
     double * getPosition();
-
     double * getBestPosition();
 };
-
-
-#endif // !PARTICLE_HPP_
-
+#endif

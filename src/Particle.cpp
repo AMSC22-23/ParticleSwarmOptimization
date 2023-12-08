@@ -1,143 +1,99 @@
-/*
-#include <random>
-#include <limits>
 #include <vector>
-#include "Particle.hpp"
-
-Particle::Particle(int dimensions, const std::vector<std::pair<double, double>>& bounds) {
-    // Marsenne Twister nb generator w/ random seed generator
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    
-    for (int i = 0; i < dimensions; ++i) {
-        std::uniform_real_distribution<> dis_pos(bounds[i].first, bounds[i].second);
-        std::uniform_real_distribution<> dis_vel(bounds[i].first, bounds[i].second);        
-        position.push_back(dis_pos(gen));
-        velocity.push_back(dis_vel(gen));
-        value = 0.0;
-        best_sol = 0.0;
-    }
-    best_position = position;
-}
-*/
-
-#include <iostream>
-#include <string>
-#include <vector>
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-#include <limits>
 #include <stdexcept>
 
 #include "Particle.hpp"
 
-
-/*
-
-FIXES NEEDED : CONDITIONS & CHECKING STUFF FOR EXAMPLE FITNESS SETTER EXTC....
-
-.................................................................................
-
-NEED TO BE ADDED : SOME TO_STRING FUNCTION THAT RETURNS A STRING WITH ALL THE VALUES OF THE PARTICLE... ( MAYBE 1 DIMENSION...)
-
-
-*/
 using namespace std;
 
-// Constructor to initialize with dynamic arrays
+/* Constructor */
 Particle::Particle(int dimensions) : dimensions(dimensions) {
-    x = new double[dimensions];
-    v = new double[dimensions];
-    x_best = new double[dimensions];
+    position = new double[dimensions];
+    velocity = new double[dimensions];
+    best_position = new double[dimensions];
 }
 
-// Destructor to free the allocated memory
+/* Destructor */
 Particle::~Particle() {
-    delete[] x;
-    delete[] v;
-    delete[] x_best;
+    delete[] position;
+    delete[] velocity;
+    delete[] best_position;
 }
 
-
-//Setter methods to access individual elements at specific indices
-void Particle::setPositionAtIndex(int index, double value){
+/* Setter methods */
+void Particle::setPosition(int index, double val){
     if (index >= 0 && index < dimensions) {
-        x[index] = value;
+        position[index] = val;
     }
     else {
         throw std::out_of_range("Index out of bounds");
     }
 }
 
-void Particle::setVelocityAtIndex(int index, double value){
+void Particle::setVelocity(int index, double val){
     if (index >= 0 && index < dimensions) {
-        v[index] = value;
+        velocity[index] = val;
     }
     else {
         throw std::out_of_range("Index out of bounds");
     }
 }
 
-void Particle::setBestPositionAtIndex(int index, double value){
+void Particle::setBestPosition(int index, double val){
     if(index >= 0 && index < dimensions){
-        x_best[index] = value;
+        best_position[index] = val;
     }
     else {
         throw std::out_of_range("Index out of bounds");
     }
 }
 
-void Particle::setFitness(double fitnessVal) {
-    fitness = fitnessVal;
+void Particle::setValue(double newVal) {
+    value = newVal;
 }
-void Particle::setBestFitness(double bestfitnessVal) {
-    bestfitness = bestfitnessVal;
+void Particle::setBestValue(double newVal) {
+    best_value = newVal;
 }
 
-// Getter methods to access individual elements at specific indices
-
-double Particle::getPosAtIndex(int index) const {
+/* Getter methods */
+double Particle::getSinglePosition(int index) const {
     if(index >= 0 && index < dimensions){
-        return x[index];
+        return position[index];
     }
     else {
         return 0.0;
     }
 }
 
-double Particle::getVelocityAtIndex(int index) const {
+double Particle::getVelocity(int index) const {
     if(index >= 0 && index < dimensions){
-        return v[index];
+        return velocity[index];
     }
     else {
         return 0.0;
     }
 }
 
-
-double Particle::getBestPosAtIndex(int index) const {
+double Particle::getBestPos(int index) const {
     if(index >= 0 && index < dimensions){
-        return x_best[index];
+        return best_position[index];
     }
     else {
         return 0.0;
     }
 }
 
-double Particle::getFitness(){
-    return fitness;
+double Particle::getValue(){
+    return value;
 }
 
-double Particle::getBestFitness(){
-    return bestfitness;
+double Particle::getBestValue(){
+    return best_value;
 }
 
 double * Particle::getPosition(){
-    return x;
+    return position;
 }
 
 double * Particle::getBestPosition(){
-    return x_best;
+    return best_position;
 }
-

@@ -8,25 +8,52 @@
 class PSO{
 public:
     PSO(){}
-    virtual void pso(std::function<double(const std::vector<double>&)> objective_function,
-            const std::vector<std::pair<double, double>>& bounds,
+    virtual void pso(double (*ObjFuncPtr)(double*, int),
+            const int dimensions,
+            const std::pair<double, double>* &bounds,
+            vector<Particle> &swarm, 
             int num_particles,
-            int max_iter, const double ciw,
+            int max_iter, 
+            const double intertiaWeight,
             const double c1, const double c2) = 0; 
 };
-
 class PSO_serial : public PSO {
 public:
-    PSO_serial(int max_iter): PSO() {
-        global_best_sol_history.reserve(max_iter);
-        global_best_positions_history.reserve(max_iter);
+    /* Constructor */
+    PSO_serial(int dimensions, int max_iter): PSO() {
+        this->max_iter = max_iter;
+        /* Global bests */
+        global_best_sol = std::numeric_limits<double>::max();
+        global_best_position = new double[dimensions];
+        /* History arrays */
+        global_best_sol_history = new double[max_iter];
+        global_best_positions_history = new double*[max_iter];
+        for(int i =0; i < max_iter; i++){
+            global_best_positions_history[i] = new double[dimensions];
+        }
     }
-    void pso(std::function<double(const std::vector<double>&)> objective_function,
-            const std::vector<std::pair<double, double>>& bounds,
-            int num_particles,int max_iter, const double ciw,
-             const double c1, const double c2) override;
+    /* Destructor */
+    ~PSO_serial() {
+        delete[] global_best_sol_history;
+        for (int i = 0; i < max_iter; i++) {
+            delete[] global_best_positions_history[i];
+        }
+        delete[] global_best_positions_history;
+    }
 
-    std::vector<double> global_best_sol_history;
-    std::vector<std::vector<double>> global_best_positions_history;
+    void pso(double (*ObjFuncPtr)(double*, int),
+           const int dimensions,
+            const std::pair<double, double>* &bounds,
+            vector<Particle> &swarm, 
+            int num_particles,
+            int max_iter, 
+            const double intertiaWeight,
+            const double c1, const double c2) override;
+
+    int max_iter;
+    double global_best_sol;
+    double* global_best_position;
+    double* global_best_sol_history;
+    double** global_best_positions_history;
 };
 #endif

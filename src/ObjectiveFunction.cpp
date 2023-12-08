@@ -59,23 +59,23 @@ double ObjectiveFunction::Quadratic_function(double* position, int dim) {
 
 pair<double, double>* ObjectiveFunction::get_bounds(string objFunction, int dim) {
     pair<double, double>* bounds = new pair<double, double>[dim];
-    if (objFunction == "Rosenbrock") {
+    if (objFunction == "rosenbrock") {
         for (int i = 0; i < dim; ++i) {
             bounds[i] = make_pair(-30, 30);
         }
-    } else if (objFunction == "Ackley") {
+    } else if (objFunction == "ackley") {
         for (int i = 0; i < dim; ++i) {
             bounds[i] = make_pair(-5, 10);
         }
-    } else if (objFunction == "Rastrigin") {
+    } else if (objFunction == "rastrigin") {
         for (int i = 0; i < dim; ++i) {
             bounds[i] = make_pair(-5.12, 5.12);
         }
-    } else if (objFunction == "SphereOne") {
+    } else if (objFunction == "sphereOne") {
         for (int i = 0; i < dim; ++i) {
             bounds[i] = make_pair(-100, 100);
         }
-    } else if (objFunction == "Quadratic") {
+    } else if (objFunction == "quadratic") {
         for (int i = 0; i < dim; ++i) {
             bounds[i] = make_pair(-100, 100);
         }

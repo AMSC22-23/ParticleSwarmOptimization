@@ -96,7 +96,6 @@ int main(int argc, char* argv[]) {
     const auto dt = duration_cast<milliseconds>(t1 - t0).count();
 
     /*OUTPUT*/
-    
 /*     ofstream file("../data/global_best_sol_history.csv");
     for (auto &val: algorithm.global_best_sol_history) {file << val << endl;} 
     file << endl;

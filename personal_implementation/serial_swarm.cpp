@@ -98,8 +98,8 @@ int main() {
 
     // PSO parameters
     // size_t p_dimensionality = 2; // problem dimensionality --> to be addressed later
-    size_t num_particles = 20;
-    size_t max_iter = 500;
+    size_t num_particles = 300;
+    size_t max_iter = 1000;
     elem_t w = 0.5;
     elem_t c1 = 2;
     elem_t c2 = 2;

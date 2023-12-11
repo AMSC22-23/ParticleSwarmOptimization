@@ -9,8 +9,6 @@
 using namespace std;
 
 #ifndef PARTICLE_HPP_
-
-
 #define PARTICLE_HPP_
 
 class Particle {
@@ -35,12 +33,12 @@ private:
 
 public:
 
-    // Constructor to initialize with dynamic arrays
+    // Constructor to initialize the dynamic arrays
     Particle(int dimensions);
 
     // Destructor to free the allocated memory
-    ~Particle();
-
+    //~Particle();
+    
     //Setter methods to access individual elements at specific indices
     void setPositionAtIndex(int index, double value);
 
@@ -64,11 +62,8 @@ public:
 
     double getBestFitness();
 
-    double * getPosition();
+    double* getPosition() const;
 
-    double * getBestPosition();
+    double * getBestPosition() const;
 };
-
-
 #endif // !PARTICLE_HPP_
-

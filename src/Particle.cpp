@@ -12,7 +12,7 @@
 
 /*
 
-FIXES NEEDED : CONDITIONS & CHECKING STUFF FOR EXAMPLE FITNESS SETTER EXTC....
+FIXES NEEDED : CONDITIONS & CHECKING STUFF FOR EXAMPLE FITNESS SETTER EXTC.... (Can fitness be negative?!...)
 
 .................................................................................
 
@@ -29,14 +29,13 @@ Particle::Particle(int dimensions) : dimensions(dimensions) {
     x_best = new double[dimensions];
 }
 
-// Destructor to free the allocated memory
+/* // Destructor to free the allocated memory 
 Particle::~Particle() {
-    delete[] x;
-    delete[] v;
-    delete[] x_best;
-}
-
-
+     delete[] x;
+     delete[] v;
+     delete[] x_best;
+ }
+*/
 //Setter methods to access individual elements at specific indices
 void Particle::setPositionAtIndex(int index, double value){
     if (index >= 0 && index < dimensions) {
@@ -92,7 +91,13 @@ double Particle::getVelocityAtIndex(int index) const {
     }
 }
 
-
+/**
+ * @brief Returns the best position of the particle at the given index
+ *
+ * @param index
+ * @return double
+ *
+*/
 double Particle::getBestPosAtIndex(int index) const {
     if(index >= 0 && index < dimensions){
         return x_best[index];
@@ -102,19 +107,46 @@ double Particle::getBestPosAtIndex(int index) const {
     }
 }
 
+/**
+ * @brief Returns the fitness value of the particle
+ *
+ * @return double
+ *
+*/
 double Particle::getFitness(){
     return fitness;
 }
 
+/**
+ * @brief Returns the best fitness value of the particle
+ *
+ * @return double
+ *
+*/
 double Particle::getBestFitness(){
     return bestfitness;
 }
 
-double * Particle::getPosition(){
-    return x;
+/**
+ * @brief Returns the position array of the particle
+ *
+ * @return double*
+ *
+*/
+double* Particle::getPosition() const {
+    double* copy = new double[dimensions];
+    std::copy(x, x + dimensions, copy);
+    return copy;
 }
 
-double * Particle::getBestPosition(){
-    return x_best;
+/**
+ * @brief Returns the best position array of the particle
+ *
+ * @return double*
+ *
+*/
+double * Particle::getBestPosition() const{
+    double* copy = new double[dimensions];
+    std::copy(x_best, x_best + dimensions, copy);
+    return copy;
 }
-

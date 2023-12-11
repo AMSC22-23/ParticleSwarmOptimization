@@ -6,9 +6,7 @@
 
 void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
             const int dimensions,
-            const std::pair<double,double>* &bounds,
             vector<Particle> &swarm,
-            int num_particles,
             int max_iter,
             const double inertiaWeight,
             const double c1,
@@ -16,7 +14,6 @@ void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
     {
     // Main loop
     for (int iter = 0; iter < max_iter; ++iter) {
-        int particle_count = 0;
 
         for (auto& particle : swarm) {
             // Update velocity & position
@@ -47,7 +44,6 @@ void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
                 global_best_position = particle.position;
                 global_best_sol = particle.value;
             }
-            particle_count++;
         }
         global_best_sol_history[iter] = global_best_sol;
         global_best_positions_history[iter] = global_best_position;

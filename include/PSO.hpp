@@ -10,12 +10,11 @@ public:
     PSO(){}
     virtual void pso(double (*ObjFuncPtr)(double*, int),
             const int dimensions,
-            const std::pair<double, double>* &bounds,
             vector<Particle> &swarm, 
-            int num_particles,
             int max_iter, 
             const double intertiaWeight,
-            const double c1, const double c2) = 0; 
+            const double c1, 
+            const double c2) = 0; 
 };
 class PSO_serial : public PSO {
 public:
@@ -43,9 +42,7 @@ public:
 
     void pso(double (*ObjFuncPtr)(double*, int),
            const int dimensions,
-            const std::pair<double, double>* &bounds,
             vector<Particle> &swarm, 
-            int num_particles,
             int max_iter, 
             const double intertiaWeight,
             const double c1, const double c2) override;

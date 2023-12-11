@@ -66,20 +66,18 @@ int main(int argc, char* argv[]) {
     // Initialize the particles of the swarm.
     int best_index = 0;
     for (int i = 0; i < num_particles; ++i) {
-        Particle particle(dimensions);
+        swarm.emplace_back(dimensions);
 
         // Init position, velocity & best position for each dimension
         for(int N = 0 ; N < dimensions; N++){
-            particle.setPosition(N, dis(gen));
-            particle.setVelocity(N, dis(gen));
-            particle.setBestPosition(N, particle.getSinglePosition(N));
+            swarm.back().setPosition(N, dis(gen));
+            swarm.back().setVelocity(N, dis(gen));
+            swarm.back().setBestPosition(N, swarm.back().getSinglePosition(N));
         }
-        particle.setValue(objective_function(particle.getPosition(),dimensions));
-        particle.setBestValue(particle.getValue());
+        swarm.back().setValue(objective_function(swarm.back().getPosition(),dimensions));
+        swarm.back().setBestValue(swarm.back().getValue());
 
-        swarm.emplace_back(particle);
-
-        if(swarm[i].getValue() < swarm[best_index].getValue()){
+        if(swarm.back().getValue() < swarm[best_index].getValue()){
             best_index = i;
         }
     }
@@ -90,7 +88,7 @@ int main(int argc, char* argv[]) {
     const auto t0 = high_resolution_clock::now();
     
     // Execute PSO(function , bounds of each dim , num particles , maxiter)
-    algorithm.pso(objective_function, dimensions, bounds, swarm, num_particles, max_iter, inertiaWeight, c1, c2);
+    algorithm.pso(objective_function, dimensions, swarm, max_iter, inertiaWeight, c1, c2);
 
     const auto t1 = high_resolution_clock::now();
     const auto dt = duration_cast<milliseconds>(t1 - t0).count();

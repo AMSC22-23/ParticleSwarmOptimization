@@ -12,7 +12,7 @@ Particle::Particle(int dimensions) : dimensions(dimensions) {
     best_position = new double[dimensions];
 }
 
-/* Destructor */
+/* Destructor */ 
 Particle::~Particle() {
     delete[] position;
     delete[] velocity;
@@ -91,8 +91,9 @@ double Particle::getBestValue(){
 }
 
 double * Particle::getPosition(){
-    return position;
-}
+    double * copy = new double[dimensions];
+    std::copy(position, position + dimensions, copy);
+    return copy;}
 
 double * Particle::getBestPosition(){
     return best_position;

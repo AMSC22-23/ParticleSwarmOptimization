@@ -10,4 +10,4 @@ include_directories(include)
 
 file(GLOB SOURCES "src/*.cpp")
 
-add_executable(SWARM main.cpp Particle.h Particle.cpp swarmfct.h swarmfct.cpp)
+add_executable(PSO_EXEC ${SOURCES})

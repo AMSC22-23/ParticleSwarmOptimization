@@ -49,13 +49,30 @@ def global_best(path):
     plt.plot(data)
     plt.xlabel("Iteration")
     plt.ylabel("Global best solution")
-    plt.show()
     plt.savefig("visualization/global_best.png")
     plt.close()
 
-global_best("data/global_best_sol_history.csv")
+def log_plot(path):
+    # Read data from CSV file
+    with open(path, 'r') as f:
+        data = [float(line.strip()) for line in f]
 
-# x_lim, y_lim , title , path to save , path to particle data
+    # Create x values representing the number of iterations
+    x = np.arange(1, len(data) + 1)
+
+    # Create the plot
+    plt.plot(x, data)
+    plt.yscale('log')
+    plt.xlabel("Iteration")
+    plt.ylabel("Global best solution")
+
+    # Save the plot
+    plt.savefig("visualization/global_best_log.png")
+
+    # Close the plot
+    plt.close()
+
+
 # plot_surface_2d([30, -30], [30,-30],"Ackley function", "visualization/frames/", "data/")
 
 """ if __name__ == '__main__':
@@ -66,3 +83,7 @@ global_best("data/global_best_sol_history.csv")
 # input folder, output folder 
 gif("visualization/frames/", "visualization/animation.gif")
  """
+
+#global_best("data/global_best_sol_history.csv")
+
+log_plot("data/global_best_sol_history.csv")

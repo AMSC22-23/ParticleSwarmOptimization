@@ -24,18 +24,19 @@ using namespace chrono;
 
 
 int main(int argc, char* argv[]) {
+    /* Error catching for input */
+    if(argc != 5){
+        cout << "Usage: " << argv[0] << " <num_particles> <dimensions> <MaxIter> <objectiveFunction>" << endl;
+        return 1;
+    }
+
     /* Convert arg strings to integers */
     int num_particles = atoi(argv[1]);
     int dimensions = atoi(argv[2]);
     int max_iter = atoi(argv[3]);
     string objFunc_name = argv[4];
  
-    /* Error catching for input */
-    if(argc != 5){
-        cout << "Usage: " << argv[0] << " <num_particles> <dimensions> <MaxIter> <objectiveFunction>" << endl;
-        return 1;
-    }
-    else if(num_particles <= 0){
+    if(num_particles <= 0){
         cout << "Error: Number of particles should be more than 0." << endl;
         return 1;
     }
@@ -117,9 +118,9 @@ int main(int argc, char* argv[]) {
     cout << "Acceleration constant 2: " << c2 << endl;
     cout << "\n----------------------------Solution-----------------------------" << endl;
     cout << "Best Value     : " << algorithm.global_best_sol_history[max_iter-1] << endl;
-    cout << "Best Position  : " << endl;
-/*     for (auto& val: algorithm.global_best_positions_history[max_iter]) { cout << val << " ";}
-    cout << endl; */
+    cout << "Best Position  : ";
+    for (int i = 0; i < dimensions; ++i) { cout << algorithm.global_best_positions_history[max_iter-1][i] << " ";}
+    cout << endl;
     cout <<  "\n----------------------------Profiling----------------------------" << endl;
     cout << "Time for all iterations: " << dt << " [ms]" << " -> " << dt/1000.0 << " [s]" << " -> " << (dt/1000.0)/60.0 << " [min]" << endl;
     cout << "Time for 1 iteration:    " << dt / max_iter << " [ms]" << endl;

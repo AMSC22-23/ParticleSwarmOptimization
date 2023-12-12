@@ -23,12 +23,12 @@ public:
         this->max_iter = max_iter;
         /* Global bests */
         global_best_sol = std::numeric_limits<double>::max();
-        global_best_position = new double[dimensions]; //memory leak here. 
+        global_best_position = new double[dimensions]; 
         /* History arrays */
         global_best_sol_history = new double[max_iter];
         global_best_positions_history = new double*[max_iter];
         for(int i =0; i < max_iter; i++){
-            global_best_positions_history[i] = new double[dimensions]; //memory leak here.
+            global_best_positions_history[i] = new double[dimensions]; 
         }
     }
     /* Destructor */

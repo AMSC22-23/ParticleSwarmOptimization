@@ -25,6 +25,38 @@ public:
         best_position = new double[dimensions];
     }
 
+    /* Copy constructor */
+    Particle(const Particle& other) : dimensions(other.dimensions) {
+        position = new double[dimensions];
+        velocity = new double[dimensions];
+        best_position = new double[dimensions];
+        std::copy(other.position, other.position + dimensions, position);
+        std::copy(other.velocity, other.velocity + dimensions, velocity);
+        std::copy(other.best_position, other.best_position + dimensions, best_position);
+        value = other.value;
+        best_value = other.best_value;
+    }
+
+    /* Copy operator */
+    Particle& operator=(const Particle& other) {
+        if (this != &other) {
+            delete[] position;
+            delete[] velocity;
+            delete[] best_position;
+
+            dimensions = other.dimensions;
+            position = new double[dimensions];
+            velocity = new double[dimensions];
+            best_position = new double[dimensions];
+            std::copy(other.position, other.position + dimensions, position);
+            std::copy(other.velocity, other.velocity + dimensions, velocity);
+            std::copy(other.best_position, other.best_position + dimensions, best_position);
+            value = other.value;
+            best_value = other.best_value;
+        }
+        return *this;
+    }
+
     /* Destructor */ 
     ~Particle() {
         delete[] position;

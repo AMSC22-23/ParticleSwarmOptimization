@@ -11,12 +11,12 @@
 #include "PSO.hpp"
 #include "ObjectiveFunction.hpp"
 
-// PSO parameters
-// Acceleration constants C1 & C2
+/*  PSO parameters
+    Acceleration constants C1 & C2 */
 const double c1 = 2.0;  // Cognitive parameter
 const double c2 = 2.0;  // Social parameter
 
-// Inertia weight
+/* Inertia weight */
 const double inertiaWeight = 0.5;
 
 using namespace std;
@@ -24,13 +24,13 @@ using namespace chrono;
 
 
 int main(int argc, char* argv[]) {
-    //Converting arg strings to integers..
+    /* Convert arg strings to integers */
     int num_particles = atoi(argv[1]);
     int dimensions = atoi(argv[2]);
     int max_iter = atoi(argv[3]);
     string objFunc_name = argv[4];
  
-    //Error catching in the arguments
+    /* Error catching for input */
     if(argc != 5){
         cout << "Usage: " << argv[0] << " <num_particles> <dimensions> <MaxIter> <objectiveFunction>" << endl;
         return 1;
@@ -51,27 +51,27 @@ int main(int argc, char* argv[]) {
     PSO_serial algorithm(dimensions, max_iter); //PSO init
     vector<Particle> swarm;                     //Swarm init
 
-    // Get bounds of obj_func
+    /* Get bounds of obj_func */
     const pair<double, double>* bounds = ObjectiveFunction::get_bounds(objFunc_name, dimensions);
 
-    //Get obj_func
+    /* Get obj_func */
     typedef double (*ObjFuncPtr)(double*, int);
     ObjFuncPtr objective_function = ObjectiveFunction::Rosenbrock;
 
-    // Uniform dist in the bounds of the obj_func
+    /* Uniform dist in the bounds of the obj_func */
     random_device rd;
     mt19937 gen(rd());
     uniform_real_distribution<> dis(bounds[0].first, bounds[0].second);
 
-    //Dealocate the bounds
+    /* Dealocate the bounds */
     delete[] bounds;
 
-    // Initialize the particles of the swarm.
+    /* Initialize the particles of the swarm. */
     int best_index = 0;
     for (int i = 0; i < num_particles; ++i) {
         swarm.emplace_back(dimensions);
 
-        // Init position, velocity & best position for each dimension
+        /* Init position, velocity & best position for each dimension */
         for(int j = 0 ; j < dimensions; j++){
             swarm.back().position[j] = dis(gen);
             swarm.back().velocity[j] = dis(gen);
@@ -88,16 +88,16 @@ int main(int argc, char* argv[]) {
     copy(swarm[best_index].position, swarm[best_index].position + dimensions, algorithm.global_best_position); // Init global best position
     algorithm.global_best_sol = swarm[best_index].value;         
 
-    // Time profiling
+    /* Time profiling */
     const auto t0 = high_resolution_clock::now();
     
-    // Execute PSO(function , bounds of each dim , num particles , maxiter)
+    /* Execute PSO(function , bounds of each dim , num particles , maxiter) */
     algorithm.pso(objective_function, dimensions, swarm, max_iter, inertiaWeight, c1, c2);
 
     const auto t1 = high_resolution_clock::now();
     const auto dt = duration_cast<milliseconds>(t1 - t0).count();
 
-    /*OUTPUT*/
+    /* OUTPUT */
     ofstream file("../data/global_best_sol_history.csv");
     for (int i = 0; i < max_iter; ++i) {
         file << algorithm.global_best_sol_history[i] << endl;

@@ -63,26 +63,30 @@ int main(int argc, char* argv[]) {
     mt19937 gen(rd());
     uniform_real_distribution<> dis(bounds[0].first, bounds[0].second);
 
+    //Dealocate the bounds
+    delete[] bounds;
+
     // Initialize the particles of the swarm.
     int best_index = 0;
     for (int i = 0; i < num_particles; ++i) {
         swarm.emplace_back(dimensions);
 
         // Init position, velocity & best position for each dimension
-        for(int N = 0 ; N < dimensions; N++){
-            swarm.back().setPosition(N, dis(gen));
-            swarm.back().setVelocity(N, dis(gen));
-            swarm.back().setBestPosition(N, swarm.back().getSinglePosition(N));
-        }
-        swarm.back().setValue(objective_function(swarm.back().getPosition(),dimensions));
-        swarm.back().setBestValue(swarm.back().getValue());
+        for(int j = 0 ; j < dimensions; j++){
+            swarm.back().position[j] = dis(gen);
+            swarm.back().velocity[j] = dis(gen);
+            swarm.back().best_position[j] = swarm.back().position[j];
 
-        if(swarm.back().getValue() < swarm[best_index].getValue()){
+        }
+        swarm.back().value = objective_function(swarm.back().position, dimensions);
+        swarm.back().best_value = swarm.back().value;
+
+        if(swarm.back().value < swarm[best_index].value){
             best_index = i;
         }
     }
-    algorithm.global_best_position = swarm[best_index].getPosition(); // Init global best position
-    algorithm.global_best_sol = swarm[best_index].getValue();         // Init global best solution
+    copy(swarm[best_index].position, swarm[best_index].position + dimensions, algorithm.global_best_position); // Init global best position
+    algorithm.global_best_sol = swarm[best_index].value;         
 
     // Time profiling
     const auto t0 = high_resolution_clock::now();
@@ -94,10 +98,12 @@ int main(int argc, char* argv[]) {
     const auto dt = duration_cast<milliseconds>(t1 - t0).count();
 
     /*OUTPUT*/
-/*     ofstream file("../data/global_best_sol_history.csv");
-    for (auto &val: algorithm.global_best_sol_history) {file << val << endl;} 
-    file << endl;
-    file.close(); */
+    ofstream file("../data/global_best_sol_history.csv");
+    for (int i = 0; i < max_iter; ++i) {
+        file << algorithm.global_best_sol_history[i] << endl;
+    }
+    file.close();
+
 
     cout << "---------------------------Parameters----------------------------" << endl;
     //cout << "PSO version: "<< "serial/parallel" << endl;

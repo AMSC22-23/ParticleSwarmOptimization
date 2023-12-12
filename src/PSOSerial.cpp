@@ -26,7 +26,7 @@ void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
                 std::vector<double> r2 = {dis(gen), dis(gen)};
 
                 // v(t+1) = inertiaWeight * v(t) + c1 * r1 * (local_best - x(t)) + c2 * r2 * (global_best - x(t))
-                particle.velocity[i] = inertiaWeight * particle.velocity[i] 
+                particle.velocity[i] = inertiaWeight * particle.velocity[i]
                                         + c1 * r1[i] * (particle.best_position[i] - particle.position[i])
                                         + c2 * r2[i] * (global_best_position[i] - particle.position[i]);
                 particle.position[i] += particle.velocity[i];
@@ -36,16 +36,17 @@ void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
             // Update local best
             if (particle.value < particle.best_value) {
                 particle.best_value = particle.value;
-                particle.best_position = particle.position;
+                copy(particle.position, particle.position + dimensions, particle.best_position);
+
             }
 
             // Update global best position and solution
             if (particle.best_value < global_best_sol) {
-                global_best_position = particle.position;
+                copy(particle.position, particle.position + dimensions, global_best_position);
                 global_best_sol = particle.value;
             }
         }
         global_best_sol_history[iter] = global_best_sol;
-        global_best_positions_history[iter] = global_best_position;
+        copy(global_best_position, global_best_position + dimensions, global_best_positions_history[iter]);
     }
 }

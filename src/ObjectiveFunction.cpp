@@ -58,7 +58,7 @@ double ObjectiveFunction::Quadratic_function(double* position, int dim) {
 }
 
 pair<double, double>* ObjectiveFunction::get_bounds(string objFunction, int dim) {
-    pair<double, double>* bounds = new pair<double, double>[dim];
+    pair<double, double>* bounds = new pair<double, double>[dim]; 
     if (objFunction == "rosenbrock") {
         for (int i = 0; i < dim; ++i) {
             bounds[i] = make_pair(-30, 30);

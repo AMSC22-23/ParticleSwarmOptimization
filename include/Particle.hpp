@@ -1,5 +1,6 @@
-#include <iostream>
-#include <string>
+#ifndef PARTICLE_HPP
+#define PARTICLE_HPP
+
 #include <array>
 #include <cmath>
 #include <cstdlib>
@@ -8,67 +9,59 @@
 
 using namespace std;
 
-#ifndef PARTICLE_HPP_
-
-
-#define PARTICLE_HPP_
-
 class Particle {
-
-private:
-    // Private member variables
-
-    // Dimension of the particle.
-    int dimensions;
-
-    // Position array :
-    double* x;
-    // Velocity array :
-    double* v;
-    // Best position array :
-    double* x_best;
-
-    // Fitness value for optimization :
-    double fitness;
-    // Best fitness value for optimization :
-    double bestfitness;
-
 public:
+    int dimensions;        // dim of problem
+    double* position;      // position of particle
+    double* velocity;      // velocity of particle
+    double* best_position; // best position of particle
+    double value;          // value of particle at current position given a function
+    double best_value;     // best value of particle given a function
 
-    // Constructor to initialize with dynamic arrays
-    Particle(int dimensions);
+    /* Constructor */
+    Particle(int dimensions) : dimensions(dimensions) {
+        position = new double[dimensions];
+        velocity = new double[dimensions];
+        best_position = new double[dimensions];
+    }
 
-    // Destructor to free the allocated memory
-    ~Particle();
+    /* Copy constructor */
+    Particle(const Particle& other) : dimensions(other.dimensions) {
+        position = new double[dimensions];
+        velocity = new double[dimensions];
+        best_position = new double[dimensions];
+        std::copy(other.position, other.position + dimensions, position);
+        std::copy(other.velocity, other.velocity + dimensions, velocity);
+        std::copy(other.best_position, other.best_position + dimensions, best_position);
+        value = other.value;
+        best_value = other.best_value;
+    }
 
-    //Setter methods to access individual elements at specific indices
-    void setPositionAtIndex(int index, double value);
+    /* Copy operator */
+    Particle& operator=(const Particle& other) {
+        if (this != &other) {
+            delete[] position;
+            delete[] velocity;
+            delete[] best_position;
 
-    void setVelocityAtIndex(int index, double value);
+            dimensions = other.dimensions;
+            position = new double[dimensions];
+            velocity = new double[dimensions];
+            best_position = new double[dimensions];
+            std::copy(other.position, other.position + dimensions, position);
+            std::copy(other.velocity, other.velocity + dimensions, velocity);
+            std::copy(other.best_position, other.best_position + dimensions, best_position);
+            value = other.value;
+            best_value = other.best_value;
+        }
+        return *this;
+    }
 
-    void setBestPositionAtIndex(int index, double value);
-
-    void setFitness(double fitnessVal);
-
-    void setBestFitness(double bestfitnessVal);
-
-    // Getter methods to access individual elements at specific indices
-
-    double getPosAtIndex(int index) const;
-
-    double getVelocityAtIndex(int index) const;
-
-    double getBestPosAtIndex(int index) const;
-
-    double getFitness();
-
-    double getBestFitness();
-
-    double * getPosition();
-
-    double * getBestPosition();
+    /* Destructor */ 
+    ~Particle() {
+        delete[] position;
+        delete[] velocity;
+        delete[] best_position;
+    }
 };
-
-
-#endif // !PARTICLE_HPP_
-
+#endif

@@ -1,12 +1,6 @@
 #ifndef PARTICLE_HPP
 #define PARTICLE_HPP
 
-#include <array>
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-#include <limits>
-
 using namespace std;
 
 class Particle {

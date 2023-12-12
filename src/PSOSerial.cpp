@@ -1,7 +1,4 @@
-#include <iostream>
-#include <limits>
 #include <random>
-#include <fstream>
 #include "PSO.hpp"
 
 void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
@@ -19,11 +16,11 @@ void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
             // Update velocity & position
             for (int i = 0; i < dimensions; ++i) {
 
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_real_distribution<> dis(0.0, 1.0);
-                std::vector<double> r1 = {dis(gen), dis(gen)};
-                std::vector<double> r2 = {dis(gen), dis(gen)};
+                random_device rd;
+                mt19937 gen(rd());
+                uniform_real_distribution<> dis(0.0, 1.0);
+                vector<double> r1 = {dis(gen), dis(gen)};
+                vector<double> r2 = {dis(gen), dis(gen)};
 
                 // v(t+1) = inertiaWeight * v(t) + c1 * r1 * (local_best - x(t)) + c2 * r2 * (global_best - x(t))
                 particle.velocity[i] = inertiaWeight * particle.velocity[i]

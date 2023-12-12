@@ -1,12 +1,8 @@
 #include <iostream>
 #include <string>
 #include <random>
-#include <ctime>
-#include <limits>
 #include <fstream>
-#include <cmath>
 #include <chrono>
-#include <memory>
 #include "Particle.hpp"
 #include "PSO.hpp"
 #include "ObjectiveFunction.hpp"

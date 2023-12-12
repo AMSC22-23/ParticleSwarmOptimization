@@ -1,7 +1,6 @@
 #ifndef PSOALGO_HPP
 #define PSOALGO_HPP
 
-#include <functional>
 #include <vector>
 #include "Particle.hpp"
 

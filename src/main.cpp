@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
     cout << "Acceleration constant 1: " << c1 << endl;
     cout << "Acceleration constant 2: " << c2 << endl;
     cout << "\n----------------------------Solution-----------------------------" << endl;
-    cout << "Best Value     : " << algorithm.global_best_sol_history[max_iter] << endl;
+    cout << "Best Value     : " << algorithm.global_best_sol_history[max_iter-1] << endl;
     cout << "Best Position  : " << endl;
 /*     for (auto& val: algorithm.global_best_positions_history[max_iter]) { cout << val << " ";}
     cout << endl; */

@@ -36,15 +36,11 @@ public:
         if (global_best_position != nullptr) {
             delete[] global_best_position;
         }
-        global_best_position = nullptr;
         delete[] global_best_sol_history;
-        global_best_sol_history = nullptr; 
         for (int i = 0; i < max_iter; i++) {
             delete[] global_best_positions_history[i];
-            global_best_positions_history[i] = nullptr;
         }
         delete[] global_best_positions_history;
-        global_best_positions_history = nullptr;
     }
 
     void pso(double (*ObjFuncPtr)(double*, int),

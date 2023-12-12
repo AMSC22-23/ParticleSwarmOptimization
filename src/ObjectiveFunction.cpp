@@ -20,9 +20,9 @@ N dimensional Rosenbrock function:
 Minimun at f(1,1,...,1) = 0
 */
 double ObjectiveFunction::Rosenbrock(double* position, int dim) {
-    double f;
-    for (int i = 0; i < dim-1; ++i) {
-        f += 100*pow(position[i+1]-pow(position[i],2),2)+pow(1-position[i],2); 
+    double f=0.0;
+    for (int i = 0; i < dim; ++i) {
+        f += 100*pow(position[i]-pow(position[i],2),2)+pow(1-position[i],2); 
     }
     return f;
 };

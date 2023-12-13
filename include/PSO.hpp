@@ -12,7 +12,7 @@ public:
             const int dimensions,
             vector<Particle> &swarm, 
             int max_iter, 
-            const double intertiaWeight,
+            double intertiaWeight,
             const double c1, 
             const double c2) = 0; 
 };
@@ -44,10 +44,10 @@ public:
     }
 
     void pso(double (*ObjFuncPtr)(double*, int),
-           const int dimensions,
+            const int dimensions,
             vector<Particle> &swarm, 
             int max_iter, 
-            const double intertiaWeight,
+            double intertiaWeight,
             const double c1, const double c2) override;
 
     int max_iter;

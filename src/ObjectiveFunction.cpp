@@ -9,10 +9,13 @@ using namespace std;
 Minimun at f(0,0) = 0
 */
 double ObjectiveFunction::Ackley(double* position, int dim) {
-    double x = position[0];
-    double y = position[1];
-    double f = -20*exp(-0.2*sqrt(0.5*(pow(x,2)+pow(y,2))))-exp(0.5*(cos(2*M_PI*x)+cos(2*M_PI*y)))+exp(1)+20;
-    return f;
+    double x =0.0;
+    double y =0.0;
+    for (int i = 0; i < dim; ++i) {
+        x += pow(position[i],2);
+        y += cos(2*M_PI*position[i]);
+    }
+    return -20 * exp(-0.2*sqrt(x/dim))-exp(y/dim)+20+M_E;
 };
 
 /*
@@ -32,7 +35,7 @@ N dimensional Rastrigin function:
 Minimun at f(0,0,...,0) = 0
 */
 double ObjectiveFunction::Rastrigin(double* position, int dim) {
-    double f;
+    double f=0.0;
     for (int i = 0; i < dim-1; ++i) {
         f += pow(position[i],2)-10*cos(2*M_PI*position[i]);
     }

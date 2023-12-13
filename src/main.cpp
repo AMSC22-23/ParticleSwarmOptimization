@@ -17,7 +17,7 @@ const double c1 = 2.0;  // Cognitive parameter
 const double c2 = 2.0;  // Social parameter
 
 /* Inertia weight */
-const double inertiaWeight = 0.5;
+double inertiaWeight = 0.5;
 
 using namespace std;
 using namespace chrono;

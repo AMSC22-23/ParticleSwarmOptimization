@@ -58,10 +58,6 @@ int main(int argc, char* argv[]) {
     /* Uniform dist in the bounds of the obj_func */
     random_device rd;
     mt19937 gen(rd());
-    uniform_real_distribution<> dis(bounds[0].first, bounds[0].second);
-
-    /* Dealocate the bounds */
-    delete[] bounds;
 
     /* Initialize the particles of the swarm. */
     int best_index = 0;
@@ -70,8 +66,11 @@ int main(int argc, char* argv[]) {
 
         /* Init position, velocity & best position for each dimension */
         for(int j = 0 ; j < dimensions; j++){
-            swarm.back().position[j] = dis(gen);
-            swarm.back().velocity[j] = dis(gen);
+            uniform_real_distribution<> dis_pos(bounds[0].first, bounds[0].second);
+            double v_max = 0.2 * (bounds[j].second - bounds[j].first);  // Clamping at 20% of the total range
+            uniform_real_distribution<> dis_vel(-v_max, v_max);
+            swarm.back().position[j] = dis_pos(gen);
+            swarm.back().velocity[j] = dis_vel(gen);
             swarm.back().best_position[j] = swarm.back().position[j];
 
         }
@@ -89,10 +88,13 @@ int main(int argc, char* argv[]) {
     const auto t0 = high_resolution_clock::now();
     
     /* Execute PSO(function , bounds of each dim , num particles , maxiter) */
-    algorithm.pso(objective_function, dimensions, swarm, max_iter, inertiaWeight, c1, c2);
+    algorithm.pso(objective_function, dimensions, bounds, swarm, num_particles, max_iter, inertiaWeight, c1, c2);
 
     const auto t1 = high_resolution_clock::now();
     const auto dt = duration_cast<milliseconds>(t1 - t0).count();
+
+    /* Dealocate the bounds */
+    delete[] bounds;
 
     /* OUTPUT */
     ofstream file("../data/global_best_sol_history.csv");

@@ -10,14 +10,13 @@ N dimensional Ackley function:
 Minimun at f(0,0,...,0,0) = 0
 */
 double ObjectiveFunction::Ackley(double* position, int dim) {
-    double f=0.0; 
     double x =0.0;
     double y =0.0;
     for (int i = 0; i < dim; ++i) {
         x += pow(position[i],2);
         y += cos(2*M_PI*position[i]);
     }
-    return f= 20 + exp(1)-20*exp(-0.2*sqrt(1/dim*x))-exp(1/dim*y);
+    return -20 * exp(-0.2*sqrt(x/dim))-exp(y/dim)+20+M_E;
 };
 
 /*
@@ -70,7 +69,7 @@ pair<double, double>* ObjectiveFunction::get_bounds(string objFunction, int dim)
         }
     } else if (objFunction == "ackley") {
         for (int i = 0; i < dim; ++i) {
-            bounds[i] = make_pair(-5, 10);
+            bounds[i] = make_pair(-15, 30);
         }
     } else if (objFunction == "rastrigin") {
         for (int i = 0; i < dim; ++i) {

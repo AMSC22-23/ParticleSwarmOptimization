@@ -9,7 +9,7 @@ public:
     double* position;      // position of particle
     double* velocity;      // velocity of particle
     double* best_position; // best position of particle
-    double value;          // value of particle at current position given a function
+    double value;          // value of particle at current position 
     double best_value;     // best value of particle given a function
 
     /* Constructor */
@@ -24,9 +24,9 @@ public:
         position = new double[dimensions];
         velocity = new double[dimensions];
         best_position = new double[dimensions];
-        std::copy(other.position, other.position + dimensions, position);
-        std::copy(other.velocity, other.velocity + dimensions, velocity);
-        std::copy(other.best_position, other.best_position + dimensions, best_position);
+        copy(other.position, other.position + dimensions, position);
+        copy(other.velocity, other.velocity + dimensions, velocity);
+        copy(other.best_position, other.best_position + dimensions, best_position);
         value = other.value;
         best_value = other.best_value;
     }
@@ -42,9 +42,9 @@ public:
             position = new double[dimensions];
             velocity = new double[dimensions];
             best_position = new double[dimensions];
-            std::copy(other.position, other.position + dimensions, position);
-            std::copy(other.velocity, other.velocity + dimensions, velocity);
-            std::copy(other.best_position, other.best_position + dimensions, best_position);
+            copy(other.position, other.position + dimensions, position);
+            copy(other.velocity, other.velocity + dimensions, velocity);
+            copy(other.best_position, other.best_position + dimensions, best_position);
             value = other.value;
             best_value = other.best_value;
         }

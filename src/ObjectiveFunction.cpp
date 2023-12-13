@@ -1,5 +1,6 @@
 #include "ObjectiveFunction.hpp"
 #include <cmath>
+#include <iostream>
 #include <string>
 
 using namespace std;

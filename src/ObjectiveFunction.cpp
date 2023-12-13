@@ -82,6 +82,9 @@ pair<double, double>* ObjectiveFunction::get_bounds(string objFunction, int dim)
         for (int i = 0; i < dim; ++i) {
             bounds[i] = make_pair(-100, 100);
         }
+    }else {
+        cout << "Error: Invalid objective function." << endl;
+        exit(1);
     }
     return bounds;
 }

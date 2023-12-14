@@ -1,11 +1,12 @@
 #include <random>
 #include <iterator>
 #include <iostream>
+#include <functional>
 #include "PSO.hpp"
 
 using namespace std;
 
-void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
+void PSO_serial::pso(function<double(double*, int)> objective_function,
             const int dimensions,
             const pair<double, double>* bounds,
             vector<Particle> &swarm,
@@ -18,13 +19,13 @@ void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
     // Main loop
     double previous_max_distance = 0.0;
     for (int iter = 0; iter < max_iter; ++iter) {
-        cout << "\n----------------------------Iter " << iter << "-----------------------------" << endl;
+        //cout << "\n----------------------------Iter " << iter << "-----------------------------" << endl;
         double adaptiveInertiaWeight = inertiaWeight;
         //double sum_local_best = 0.0;
         double max_distance = 0.0;
 
         for (auto& particle : swarm) {
-            particle.value = ObjFuncPtr(particle.position, dimensions);
+            particle.value = objective_function(particle.position, dimensions);
             //cout<<"Particle value: "<<particle.value<<endl;
 
             // Compute euclidian dist to global best
@@ -108,7 +109,7 @@ void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
         global_best_sol_history[iter] = global_best_sol;
         copy(global_best_position, global_best_position + dimensions, global_best_positions_history[iter]);
 
-    cout << "Global best solution: " << global_best_sol << endl;
-    cout << "Inertia Weight: " << adaptiveInertiaWeight << endl;
+    //cout << "Global best solution: " << global_best_sol << endl;
+    //cout << "Inertia Weight: " << adaptiveInertiaWeight << endl;
     }
 }

@@ -2,6 +2,7 @@
 #include <cmath>
 #include <string>
 #include <iostream>
+#include <functional>
 
 using namespace std;
 
@@ -83,9 +84,23 @@ pair<double, double>* ObjectiveFunction::get_bounds(string objFunction, int dim)
         for (int i = 0; i < dim; ++i) {
             bounds[i] = make_pair(-100, 100);
         }
+    }
+    return bounds;
+}
+
+function<double(double*, int)> ObjectiveFunction::get_objective_function(string objective_function_name) {
+    if (objective_function_name == "rosenbrock") {
+        return Rosenbrock;
+    } else if (objective_function_name == "ackley") {
+        return Ackley;
+    } else if (objective_function_name == "rastrigin") {
+        return Rastrigin;
+    } else if (objective_function_name == "sphereOne") {
+        return SphereOne;
+    } else if (objective_function_name == "quadratic") {
+        return Quadratic_function;
     } else {
         cout << "Error: Invalid objective function." << endl;
         exit(1);
     }
-    return bounds;
 }

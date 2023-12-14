@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 using namespace std;
 namespace ObjectiveFunction {
@@ -14,5 +15,6 @@ namespace ObjectiveFunction {
     double SphereOne(double* position, int dim);
 
     pair<double, double>* get_bounds(string objFunction,int dim);
+    function<double(double*, int)> get_objective_function(string objective_function_name);
 }
 #endif

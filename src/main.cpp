@@ -7,6 +7,7 @@
 #include <cmath>
 #include <chrono>
 #include <memory>
+#include <functional>
 #include "Particle.hpp"
 #include "PSO.hpp"
 #include "ObjectiveFunction.hpp"
@@ -55,9 +56,7 @@ int main(int argc, char* argv[]) {
     /* Get bounds of obj_func */
     const pair<double, double>* bounds = ObjectiveFunction::get_bounds(objFunc_name, dimensions);
 
-    /* Get obj_func */
-    typedef double (*ObjFuncPtr)(double*, int);
-    ObjFuncPtr objective_function = ObjectiveFunction::Rosenbrock;
+    function<double(double*, int)> objective_function = ObjectiveFunction::get_objective_function(objFunc_name);
 
     /* Uniform dist in the bounds of the obj_func */
     random_device rd;

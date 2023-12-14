@@ -8,7 +8,7 @@
 class PSO{
 public:
     PSO(){}
-    virtual void pso(double (*ObjFuncPtr)(double*, int),
+    virtual void pso(function<double(double*, int)> objective_function,
             const int dimensions,
             vector<Particle> &swarm, 
             int max_iter, 
@@ -43,7 +43,7 @@ public:
         delete[] global_best_positions_history;
     }
 
-    void pso(double (*ObjFuncPtr)(double*, int),
+    void pso(function<double(double*, int)> objective_function,
             const int dimensions,
             vector<Particle> &swarm, 
             int max_iter, 

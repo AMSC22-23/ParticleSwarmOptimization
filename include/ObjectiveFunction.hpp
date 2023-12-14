@@ -2,6 +2,7 @@
 #define OBJECTIVEFUNCTION_HPP
 
 #include <string>
+#include <functional>
 #include <vector>
 
 using namespace std;
@@ -14,5 +15,6 @@ namespace ObjectiveFunction {
     double SphereOne(double* position, int dim);
 
     pair<double, double>* get_bounds(string objFunction,int dim);
+    function<double(double*, int)> get_objective_function(string objFunction);
 }
 #endif

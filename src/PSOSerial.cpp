@@ -4,7 +4,7 @@
 #include <fstream>
 #include "PSO.hpp"
 
-void PSO_serial::pso(double (*ObjFuncPtr)(double*, int),
+void PSO_serial::pso(function<double(double*, int)> objective_function,
             const int dimensions,
             vector<Particle> &swarm,
             int max_iter,
@@ -71,7 +71,7 @@ double previous_max_distance = 0.0;
                 particle.position[i] += particle.velocity[i];
 
             }
-            particle.value = ObjFuncPtr(particle.position, dimensions);
+            particle.value = objective_function(particle.position, dimensions);
 
             // Update local best
             if (particle.value < particle.best_value) {

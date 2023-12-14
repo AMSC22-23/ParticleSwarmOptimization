@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <functional>
 
 using namespace std;
 
@@ -45,7 +46,7 @@ double ObjectiveFunction::Rastrigin(double* position, int dim) {
 
 /* Sphere function */
 double ObjectiveFunction::SphereOne(double* position, int dim) {
-    double result;
+    double result=0.0;
     for(int i = 0; i < dim-1; i++){
         result += pow(position[i],2);
     }
@@ -54,7 +55,7 @@ double ObjectiveFunction::SphereOne(double* position, int dim) {
 
 /* Simple quadratic function */
 double ObjectiveFunction::Quadratic_function(double* position, int dim) {
-    double result;
+    double result=0.0;
     for (int i = 0; i < dim-1; i++) {
         result += (i+1)*10*pow(position[i],2) + (i+1)*20*pow(position[i],2);
     }
@@ -88,4 +89,21 @@ pair<double, double>* ObjectiveFunction::get_bounds(string objFunction, int dim)
         exit(1);
     }
     return bounds;
+}
+
+function<double(double*, int)> ObjectiveFunction::get_objective_function(string objective_function_name) {
+    if (objective_function_name == "rosenbrock") {
+        return Rosenbrock;
+    } else if (objective_function_name == "ackley") {
+        return Ackley;
+    } else if (objective_function_name == "rastrigin") {
+        return Rastrigin;
+    } else if (objective_function_name == "sphereOne") {
+        return SphereOne;
+    } else if (objective_function_name == "quadratic") {
+        return Quadratic_function;
+    } else {
+        cout << "Error: Invalid objective function." << endl;
+        exit(1);
+    }
 }

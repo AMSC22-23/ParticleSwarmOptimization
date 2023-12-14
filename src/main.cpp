@@ -7,16 +7,17 @@
 #include <cmath>
 #include <chrono>
 #include <memory>
+#include <functional>
 #include "Particle.hpp"
-#include "PSO.hpp"
 #include "ObjectiveFunction.hpp"
+#include "Swarm.hpp"
 
-/*  PSO parameters
-    Acceleration constants C1 & C2 */
+// PSO parameters
+//    Acceleration constants C1 & C2
 const double c1 = 2.0;  // Cognitive parameter
 const double c2 = 2.0;  // Social parameter
 
-/* Inertia weight */
+// Inertia weight
 double inertiaWeight = 0.5;
 
 using namespace std;
@@ -24,17 +25,18 @@ using namespace chrono;
 
 
 int main(int argc, char* argv[]) {
-    /* Error catching for input */
-    if(argc != 5){
+    // Error catching for input
+    if(argc != 6){
         cout << "Usage: " << argv[0] << " <num_particles> <dimensions> <MaxIter> <objectiveFunction>" << endl;
         return 1;
     }
 
-    /* Convert arg strings to integers */
+    // Convert arg strings to integers
     int num_particles = atoi(argv[1]);
     int dimensions = atoi(argv[2]);
     int max_iter = atoi(argv[3]);
-    string objFunc_name = argv[4];
+    string objective_function_name = argv[4];
+    int history = atoi(argv[5]);
  
     if(num_particles <= 0){
         cout << "Error: Number of particles should be more than 0." << endl;
@@ -49,62 +51,33 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    PSO_serial algorithm(dimensions, max_iter); //PSO init
-    vector<Particle> swarm;                     //Swarm init
+    // Global best solution history
+    double* global_best_sol_history = new double[max_iter];
 
-    /* Get bounds of obj_func */
-    const pair<double, double>* bounds = ObjectiveFunction::get_bounds(objFunc_name, dimensions);
-
-    /* Get obj_func */
-    typedef double (*ObjFuncPtr)(double*, int);
-    ObjFuncPtr objective_function = ObjectiveFunction::Rosenbrock;
-
-    /* Uniform dist in the bounds of the obj_func */
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_real_distribution<> dis(bounds[0].first, bounds[0].second);
-
-    /* Dealocate the bounds */
-    delete[] bounds;
-
-    /* Initialize the particles of the swarm. */
-    int best_index = 0;
-    for (int i = 0; i < num_particles; ++i) {
-        swarm.emplace_back(dimensions);
-
-        /* Init position, velocity & best position for each dimension */
-        for(int j = 0 ; j < dimensions; j++){
-            swarm.back().position[j] = dis(gen);
-            swarm.back().velocity[j] = dis(gen);
-            swarm.back().best_position[j] = swarm.back().position[j];
-
-        }
-        swarm.back().value = objective_function(swarm.back().position, dimensions);
-        swarm.back().best_value = swarm.back().value;
-
-        if(swarm.back().value < swarm[best_index].value){
-            best_index = i;
-        }
-    }
-    copy(swarm[best_index].position, swarm[best_index].position + dimensions, algorithm.global_best_position); // Init global best position
-    algorithm.global_best_sol = swarm[best_index].value;         
-
-    /* Time profiling */
+    // Time profiling
     const auto t0 = high_resolution_clock::now();
     
-    /* Execute PSO(function , bounds of each dim , num particles , maxiter) */
-    algorithm.pso(objective_function, dimensions, swarm, max_iter, inertiaWeight, c1, c2);
+    // Execute PSO
+    Swarm swarm(num_particles, dimensions, objective_function_name);
+
+    for (int i = 0; i < max_iter; ++i) {
+        swarm.updateParticles();
+        swarm.updateGlobalBestParticle();
+        
+        //global_best_sol_history[i] = history ? swarm.global_best_particle.value : global_best_sol_history[i];
+    }
 
     const auto t1 = high_resolution_clock::now();
     const auto dt = duration_cast<milliseconds>(t1 - t0).count();
 
-    /* OUTPUT */
-    ofstream file("../data/global_best_sol_history.csv");
+    // OUTPUT
+/*     ofstream file("../data/global_best_sol_history.csv");
     for (int i = 0; i < max_iter; ++i) {
-        file << algorithm.global_best_sol_history[i] << endl;
+        file << global_best_sol_history[i] << endl;
     }
-    file.close();
+    file.close(); */
 
+    delete[] global_best_sol_history;
 
     cout << "---------------------------Parameters----------------------------" << endl;
     //cout << "PSO version: "<< "serial/parallel" << endl;
@@ -117,14 +90,10 @@ int main(int argc, char* argv[]) {
     cout << "Acceleration constant 1: " << c1 << endl;
     cout << "Acceleration constant 2: " << c2 << endl;
     cout << "\n----------------------------Solution-----------------------------" << endl;
-    cout << "Best Value     : " << algorithm.global_best_sol_history[max_iter-1] << endl;
-    cout << "Best Position  : ";
-    for (int i = 0; i < dimensions; ++i) { cout << algorithm.global_best_positions_history[max_iter-1][i] << " ";}
-    cout << endl;
+    cout << "Best Value     : " << swarm.global_best_particle.value << endl;
     cout <<  "\n----------------------------Profiling----------------------------" << endl;
     cout << "Time for all iterations: " << dt << " [ms]" << " -> " << dt/1000.0 << " [s]" << " -> " << (dt/1000.0)/60.0 << " [min]" << endl;
     cout << "Time for 1 iteration:    " << dt / max_iter << " [ms]" << endl;
-    cout << "Memory used:             " << sizeof(algorithm) << " [bytes]" << endl;
 
     return 0;
 }

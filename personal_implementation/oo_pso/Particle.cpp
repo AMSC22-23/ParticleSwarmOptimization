@@ -4,8 +4,8 @@ template <typename T, typename Fun>
 Particle<T, Fun>::Particle(const Fun& fun, const size_t& D) : _D(D)
 {
     for (size_t dim = 0; dim < _D; ++dim) {
-        _position.push_back(_dist_position(_rng));
-        _velocity.push_back(_dist_velocity(_rng));
+        _position.emplace_back(_dist_position(_rng));
+        _velocity.emplace_back(_dist_velocity(_rng));
     }
 
     _best_position = _position;
@@ -76,13 +76,13 @@ const T& Particle<T, Fun>::getBestValue() const
 template <typename T, typename Fun>
 void Particle<T, Fun>::info() const 
 {
-    std::cout << "Position: ";
+    std::cout << "Position     : ";
     for (const auto& elem : _position) {
         std::cout << elem << " ";
     }
     std::cout << std::endl;
 
-    std::cout << "Velocity: ";
+    std::cout << "Velocity     : ";
     for (const auto& elem : _velocity) {
         std::cout << elem << " ";
     }
@@ -94,8 +94,8 @@ void Particle<T, Fun>::info() const
     }
     std::cout << std::endl;
 
-    std::cout << "Value: " << _value << std::endl;
-    std::cout << "Best Value: " << _best_value << std::endl;
+    std::cout << "Value       : " << _value << std::endl;
+    std::cout << "Best Value  : " << _best_value << std::endl;
 }
 
 

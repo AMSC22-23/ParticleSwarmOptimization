@@ -5,6 +5,7 @@ constexpr double eps = std::numeric_limits<double>::epsilon();
 
 template <typename T, typename I, typename Fun, typename Obj>
 PSO<T, I, Fun, Obj>::PSO(const I& max_iter,
+                         const T& tol,
                          const T& w,
                          const T& c1,
                          const T& c2,
@@ -12,10 +13,12 @@ PSO<T, I, Fun, Obj>::PSO(const I& max_iter,
                          const Fun& fun,
                          const I& D)
     : _max_iter(max_iter)
+    , _tol(tol)
     , _w(w)
     , _c1(c1)
     , _c2(c2)
     , _num_particles(num_particles)
+    , _fun(fun)
     , _D(D) 
 {
     std::cout << "\n============================================="
@@ -24,40 +27,26 @@ PSO<T, I, Fun, Obj>::PSO(const I& max_iter,
               << "\n---------------------------------------------"
               << "\n=============================================" << std::endl;
 
-    for (size_t i = 0; i < _num_particles; ++i) {
-        _particles.push_back(Obj(fun, _D));
-    }
+    setParticles();
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
-const std::vector<Obj>& PSO<T, I, Fun, Obj>::getParticles() const 
+PSO<T, I, Fun, Obj>::PSO() 
 {
-    return _particles;
+    std::cout << "\n============================================="
+              << "\n---------------------------------------------"
+              << "\n               PSO algorithm                 " 
+              << "\n---------------------------------------------"
+              << "\n=============================================" << std::endl;
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
-void PSO<T, I, Fun, Obj>::local_best(Obj& particle, const Fun& fun) const 
+void PSO<T, I, Fun, Obj>::setParticles() 
 {
-    particle.setValue(fun(particle.getPosition()));
-
-    if (particle.getValue() < particle.getBestValue()) {
-        particle.setBestPosition(particle.getPosition());
-        particle.setBestValue(particle.getValue());
+    for (size_t p = 0; p < _num_particles; ++p) 
+    {
+        _particles.emplace_back(Obj(_fun, _D));
     }
-}
-
-template <typename T, typename I, typename Fun, typename Obj>
-std::vector<T> PSO<T, I, Fun, Obj>::getGlobalBest(std::vector<Obj>& particles) const 
-{
-    size_t best_part_id = 0;
-    for (size_t i = 1; i < particles.size(); ++i) {
-        if (particles[i].getBestValue() < particles[best_part_id].getBestValue()) {
-            best_part_id = i;
-        }
-    }
-
-    std::vector<T> best = particles[best_part_id].getBestPosition();
-    return best;
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
@@ -67,33 +56,152 @@ void PSO<T, I, Fun, Obj>::setGlobalBest(const std::vector<T>& gbp)
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
-void PSO<T, I, Fun, Obj>::info() const {
-    std::cout << "\n=============================================" << std::endl;
-    std::cout << "Max Iter: " << _max_iter << std::endl;
-    std::cout << "Number of Particles: " << _num_particles << std::endl;
-    std::cout << "Inertia Weight: " << _w << std::endl;
-    std::cout << "Cognitive Parameter: " << _c1 << std::endl;
-    std::cout << "Social Parameter: " << _c2 << std::endl;
-    std::cout << "=============================================" << std::endl;
+void PSO<T, I, Fun, Obj>::setExactSolution(const std::vector<T>& exact_solution) 
+{
+    _exact_solution = exact_solution;
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
-void PSO<T, I, Fun, Obj>::solve(const Fun& fun) {
+void PSO<T, I, Fun, Obj>::setFunction(const Fun& fun) 
+{
+    _fun = fun;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::setNParticles(const I& num_particles) 
+{
+    _num_particles = num_particles;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::setMaxIter(const I& max_iter) 
+{
+    _max_iter = max_iter;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::setW(const T& w) 
+{
+    _w = w;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::setC1(const T& c1) 
+{
+    _c1 = c1;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::setC2(const T& c2) 
+{
+    _c2 = c2;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::setD(const I& D) 
+{
+    _D = D;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::setTol(const T& tol) 
+{
+    _tol = tol;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const std::vector<Obj>& PSO<T, I, Fun, Obj>::getParticles() const 
+{
+    return _particles;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+std::vector<T> PSO<T, I, Fun, Obj>::getGlobalBest() const 
+{
+    size_t best_part_id = 0;
+    for (size_t i = 1; i < _particles.size(); ++i) {
+        if (_particles[i].getBestValue() < _particles[best_part_id].getBestValue()) {
+            best_part_id = i;
+        }
+    }
+
+    std::vector<T> best = _particles[best_part_id].getBestPosition();
+    return best;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const std::vector<T>& PSO<T, I, Fun, Obj>::getExactSolution() const 
+{
+    return _exact_solution;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const Fun& PSO<T, I, Fun, Obj>::getFunction() const 
+{
+    return _fun;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const I& PSO<T, I, Fun, Obj>::getNParticles() const 
+{
+    return _num_particles;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const I& PSO<T, I, Fun, Obj>::getMaxIter() const 
+{
+    return _max_iter;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const T& PSO<T, I, Fun, Obj>::getW() const 
+{
+    return _w;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const T& PSO<T, I, Fun, Obj>::getC1() const 
+{
+    return _c1;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>   
+const T& PSO<T, I, Fun, Obj>::getC2() const 
+{
+    return _c2;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const I& PSO<T, I, Fun, Obj>::getD() const 
+{
+    return _D;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const T& PSO<T, I, Fun, Obj>::getTol() const 
+{
+    return _tol;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::localBest(Obj& particle) const 
+{
+    particle.setValue(_fun(particle.getPosition()));
+
+    if (particle.getValue() < particle.getBestValue()) {
+        particle.setBestPosition(particle.getPosition());
+        particle.setBestValue(particle.getValue());
+    }
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::solve() {
     for (I it = 0; it < _max_iter; ++it) {
-        _gbp = getGlobalBest(_particles);
+        _gbp = getGlobalBest();
 
-        std::cout << "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
-                  << "\nIteration: " << it + 1 
-                  << "\n - Initial Best Value : " << fun(_gbp);
-
-        for (size_t p = 0; p < _num_particles; ++p) {
-            // std::cout << "Particle " << p + 1 << "\t"
-            //           << "Initial Position: (" << _particles[p].getPosition()[0] << ", " << _particles[p].getBestPosition()[1] << ") | "
-            //           << "Velocity: (" << _particles[p].getVelocity()[0] << ", " << _particles[p].getVelocity()[1] << ") | "
-            //           << "Value: " << _particles[p].getValue() << " | "
-            //           << "Best Position: (" << _particles[p].getBestPosition()[0] << ", " << _particles[p].getBestPosition()[1] << ")" << std::endl;
-
-            local_best(_particles[p], fun);
+        for (size_t p = 0; p < _num_particles; ++p) 
+        {
+            localBest(_particles[p]);
 
             std::vector<T> r1, r2;
             for (size_t d = 0; d < _D; ++d) 
@@ -114,33 +222,57 @@ void PSO<T, I, Fun, Obj>::solve(const Fun& fun) {
                 _particles[p].getPosition()[d] = _particles[p].getPosition()[d] + _particles[p].getVelocity()[d];
             }
 
-            local_best(_particles[p], fun);
-
-            // std::cout << "Particle " << p + 1 << "\t"
-            //           << "Final Position: (" << _particles[p].getPosition()[0] << ", " << _particles[p].getBestPosition()[1] << ") | "
-            //           << "Velocity: (" << _particles[p].getVelocity()[0] << ", " << _particles[p].getVelocity()[1] << ") | "
-            //           << "Value: " << _particles[p].getValue() << " | "
-            //           << "Best Position: (" << _particles[p].getBestPosition()[0] << ", " << _particles[p].getBestPosition()[1] << ")" << std::endl;
+            localBest(_particles[p]);
         }
 
-        std::vector<T> gbp_new = getGlobalBest(_particles);
+        std::vector<T> gbp_new = getGlobalBest();
 
-        _increment = std::abs(fun(gbp_new) - fun(_gbp));
-
-        if (fun(gbp_new) < fun(_gbp))
+        if (_fun(gbp_new) < _fun(_gbp))
         {
             setGlobalBest(gbp_new);
             _w = std::min(_w*1.2, 0.9); // correction, if you are doing good, you can go faster
             if (std::abs(_w - 0.9) < eps) { _w *= 0.95; } //if you are going too fast, slow down a little
-        } else{
+        } else {
             _w = std::max(_w*0.9, 0.1); // correction, if you are doing bad, you should go slower
             if (std::abs(_w - 0.1) < eps) { _w *= 2; } // if you are going too slow, speed up a little
         }
 
-        std::cout << "\n - Final Best Value   : " << fun(_gbp) 
-                  << "\n - Increment          : " << _increment;
+        if (errorNorm(_gbp) < _tol)
+        {
+            std::cout << "\n Convergence achieved in " << it + 1 << " iterations" << std::endl;
+            break;
+        };
+
+        if (it == _max_iter - 1)
+        {
+            std::cout << "\n Maximum number of iterations reached" << std::endl;
+            std::cout << "\n Tolerance achieved: " << errorNorm(_gbp) << std::endl;
+        }
     }
-    std::cout << "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::info(const std::string& fun_name) const {
+    std::cout << "\n=============================================" << std::endl;
+    std::cout << " Function            : " << fun_name << std::endl;
+    std::cout << " Problem Dimension   : " << _D << std::endl;
+    std::cout << " Max Iter            : " << _max_iter << std::endl;
+    std::cout << " Tolerance           : " << _tol << std::endl;
+    std::cout << " Number of Particles : " << _num_particles << std::endl;
+    std::cout << " Inertia Weight      : " << _w << std::endl;
+    std::cout << " Cognitive Parameter : " << _c1 << std::endl;
+    std::cout << " Social Parameter    : " << _c2 << std::endl;
+    std::cout << "=============================================" << std::endl;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+const T PSO<T, I, Fun, Obj>::errorNorm(const std::vector<T>& vec) const
+{
+    T norm = 0;
+    for (size_t i = 0; i < vec.size(); ++i) {
+        norm += (vec[i] - _exact_solution[i]) * (vec[i] - _exact_solution[i]);
+    }
+    return std::sqrt(norm);
 }
 
 template class PSO<double, int, std::function<double(const std::vector<double>&)>, Particle<double, std::function<double(const std::vector<double>&)>>>;

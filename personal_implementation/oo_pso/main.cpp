@@ -2,10 +2,9 @@
 #include <vector>
 #include <functional>
 #include <random>
+#include <chrono>
 #include "Particle.hpp"
 #include "PSO.hpp"
-
-constexpr size_t D = 42; // problem dimension
 
 namespace Function 
 {
@@ -58,7 +57,7 @@ namespace Function
     }
 
     template <typename T>
-    T Griewank(const std::vector<T>& x)
+    T Griewank(const std::vector<T>& x) // more particles needed
     {
         T sum = 0;
         T prod = 1;
@@ -71,43 +70,105 @@ namespace Function
 
         return 1.0 + sum - prod;
     }
+
+    template <typename T>
+    T Rastrigin(const std::vector<T>& x) // more particles needed
+    {
+        T result = 0;
+        for (const auto& xi : x) {
+            result += xi * xi - 10 * std::cos(2 * M_PI * xi) + 10;
+        }
+        return result;
+    }
 }
 
-int main() 
-{  
-    std::function<double(const std::vector<double>&)> fun = Function::Ackley<double>; // choose the function to minimize
+int main()
+{   
+    size_t D;
+    std::cout << "\nEnter the problem dimension:\n\n ";
+    std::cin >> D;
+
+    std::string functionName;
+    std::cout << "\nEnter the function name:\n -Rosenbrock (HARD, flat global minimun region) \n -Sphere (EASY) \n -Ackley (MEDIUM, many local minima)\n -Griewank (VERY HARD, many local minima) \n -Rastrigin (VERY HARD, many local minima)\n\n ";
+    std::cin >> functionName;
+
+
+
+    std::function<double(const std::vector<double>&)> fun;
     using ParticleType = Particle<double, decltype(fun)>;
     using PSOType = PSO<double, int, decltype(fun), ParticleType>;
 
-    size_t max_iter = 2000;     // maximum number of iterations
-    double w = 0.5;             // inertia weight, how much the previous velocity is taken into account
-    double c1 = 2;              // cognitive parameter, how much the particle remembers its best position
-    double c2 = 2;              // social parameter, how much the particle remembers the best position of the swarm
-    size_t num_particles = 20;  // number of particles
+    std::vector<double> exact_solution; // exact solution of the problem
 
-    /*
-        1st hyperparameter tuning attempt: (see PSO.solve() for the algorithm) --> more suitable for non-convex functions
-            - if the best position of the swarm is not updated for one iteration
-              the inertia weight is decreased
-            -  else the inertia weight is increased
+    if (functionName == "Rosenbrock" || functionName == "rosenbrock" || functionName == "ROSENBROCK")
+    {
+        fun = Function::Rosenbrock<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(1.0);
+    } else if (functionName == "Sphere" || functionName == "sphere" || functionName == "SPHERE")
+    {
+        fun = Function::Sphere<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(0.0);
+    } else if (functionName == "Ackley" || functionName == "ackley" || functionName == "ACKLEY")
+    {
+        fun = Function::Ackley<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(0.0);
+    } else if (functionName == "Griewank" || functionName == "griewank" || functionName == "GRIEWANK")
+    {
+        fun = Function::Griewank<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(0.0);
+    } else if (functionName == "Rastrigin" || functionName == "rastrigin" || functionName == "RASTRIGIN")
+    {
+        fun = Function::Rastrigin<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(0.0);
+    }
+    else
+    {
+        std::cerr << "Invalid function name. Exiting." << std::endl;
+        return 1;
+    }
 
-        2d approach: maybe different bounds for initial position and velocity (?)
-    */
+    size_t max_iter, num_particles;
+    double tol;
+    std::cout << "\nEnter the maximum number of iterations:\n\n ";
+    std::cin >> max_iter;
+    std::cout << "\nEnter the tolerance: \n\n ";
+    std::cin >> tol;
+    std::cout << "\nEnter the number of particles: \n\n ";
+    std::cin >> num_particles;
 
-    // std::vector<ParticleType> particles;
+    PSOType pso;
 
-    // for (size_t i = 0; i < num_particles; ++i) {
-    //     std::cout << "Particle: " << i + 1 << std::endl;
-    //     particles.emplace_back(ParticleType(fun, D));
-    //     particles[i].info();
-    //     std::cout << std::endl;
-    // }
+    {
+        using namespace std::chrono;
+        std::cout << "\n PSO initialization ..." << std::endl;
+        auto start = high_resolution_clock::now();
+        pso.setMaxIter(max_iter);
+        pso.setTol(tol);
+        pso.setNParticles(num_particles);
+        pso.setFunction(fun);
+        pso.setD(D);
+        pso.setExactSolution(exact_solution);
+        pso.setParticles();
+        pso.info(functionName); // passing the function name to info method
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<milliseconds>(stop - start);
+        std::cout << "\n Elapsed time for initialization: " << duration.count() << " ms" << std::endl;
+    }
 
-    PSOType pso(max_iter, w, c1, c2, num_particles, fun, D);
-
-    pso.solve(fun);
-
-    pso.info();
+    {
+        using namespace std::chrono;
+        std::cout << "\n PSO solving ..." << std::endl;
+        auto start = high_resolution_clock::now();
+        pso.solve();
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<milliseconds>(stop - start);
+        std::cout << "\n Elapsed time for solving: " << duration.count() << " ms" << std::endl;
+    }
 
     return 0;
 }

@@ -1,3 +1,5 @@
 .DS_Store
-personal_implementation/.DS_Store
-personal_implementation/.vscode/
+.gitignore
+build/
+.vscode/
+data/

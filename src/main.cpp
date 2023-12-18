@@ -1,126 +1,99 @@
 #include <iostream>
-#include <string>
+#include <vector>
+#include <functional>
 #include <random>
-#include <fstream>
 #include <chrono>
+
 #include "Particle.hpp"
 #include "PSO.hpp"
-#include "ObjectiveFunction.hpp"
+#include "Functions.hpp"
 
-/*  PSO parameters
-    Acceleration constants C1 & C2 */
-const double c1 = 2.0;  // Cognitive parameter
-const double c2 = 2.0;  // Social parameter
-
-/* Inertia weight */
-const double inertiaWeight = 0.5;
-
-using namespace std;
+using namespace std; 
 using namespace chrono;
 
+int main()
+{   
+    size_t D;
+    cout << "\nEnter the problem dimension:\n\n ";
+    cin >> D;
 
-int main(int argc, char* argv[]) {
-    /* Error catching for input */
-    if(argc != 5){
-        cout << "Usage: " << argv[0] << " <num_particles> <dimensions> <MaxIter> <objectiveFunction>" << endl;
+    string functionName;
+    cout << "\nEnter the function name:\n 1-Rosenbrock (HARD, flat global minimun region) \n 2-Sphere (EASY) \n 3-Ackley (MEDIUM, many local minima)\n 4-Griewank (VERY HARD, many local minima) \n 5-Rastrigin (VERY HARD, many local minima)\n\n ";
+    cin >> functionName;
+
+    function<double(const vector<double>&)> fun;
+    using ParticleType = Particle<double, decltype(fun)>;
+    using PSOType = PSO<double, int, decltype(fun), ParticleType>;
+
+    vector<double> exact_solution; // exact solution of the problem
+
+    if (functionName == "1")
+    {
+        fun = Function::Rosenbrock<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(1.0);
+    } else if (functionName == "2")
+    {
+        fun = Function::Sphere<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(0.0);
+    } else if (functionName == "3")
+    {
+        fun = Function::Ackley<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(0.0);
+    } else if (functionName == "4")
+    {
+        fun = Function::Griewank<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(0.0);
+    } else if (functionName == "5")
+    {
+        fun = Function::Rastrigin<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(0.0);
+    }
+    else
+    {
+        cerr << "Invalid function name. Exiting." << endl;
         return 1;
     }
 
-    /* Convert arg strings to integers */
-    int num_particles = atoi(argv[1]);
-    int dimensions = atoi(argv[2]);
-    int max_iter = atoi(argv[3]);
-    string objFunc_name = argv[4];
- 
-    if(num_particles <= 0){
-        cout << "Error: Number of particles should be more than 0." << endl;
-        return 1;
+    size_t max_iter, num_particles;
+    double tol;
+    cout << "\nEnter the maximum number of iterations:\n\n ";
+    cin >> max_iter;
+    cout << "\nEnter the tolerance: \n\n ";
+    cin >> tol;
+    cout << "\nEnter the number of particles: \n\n ";
+    cin >> num_particles;
+
+    PSOType pso;
+
+    {
+        cout << "\n PSO initialization ..." << endl;
+        auto start = high_resolution_clock::now();
+        pso.setMaxIter(max_iter);
+        pso.setTol(tol);
+        pso.setNParticles(num_particles);
+        pso.setFunction(fun);
+        pso.setD(D);
+        pso.setExactSolution(exact_solution);
+        pso.setParticles();
+        pso.info(functionName); // passing the function name to info method
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<milliseconds>(stop - start);
+        cout << "\n Elapsed time for initialization: " << duration.count() << " ms" << endl;
     }
-    else if(dimensions <= 0){
-        cout << "Error: Dimensions of the problem should be at least 1." << endl;
-        return 1;
+
+    {
+        cout << "\n PSO solving ..." << endl;
+        auto start = high_resolution_clock::now();
+        pso.solve();
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<milliseconds>(stop - start);
+        cout << "\n Elapsed time for solving: " << duration.count() << " ms" << endl;
     }
-    else if(max_iter <= 0){
-        cout << "Error : the amount of iterations should be at least greater than 1." << endl;
-        return 1;
-    }
-
-    PSO_serial algorithm(dimensions, max_iter); //PSO init
-    vector<Particle> swarm;                     //Swarm init
-
-    /* Get bounds of obj_func */
-    const pair<double, double>* bounds = ObjectiveFunction::get_bounds(objFunc_name, dimensions);
-
-    function<double(double*, int)> objective_function = ObjectiveFunction::get_objective_function(objFunc_name);
-
-    /* Uniform dist in the bounds of the obj_func */
-    random_device rd;
-    mt19937 gen(rd());
-
-    /* Initialize the particles of the swarm. */
-    int best_index = 0;
-    for (int i = 0; i < num_particles; ++i) {
-        swarm.emplace_back(dimensions);
-
-        /* Init position, velocity & best position for each dimension */
-        for(int j = 0 ; j < dimensions; j++){
-            uniform_real_distribution<> dis_pos(bounds[0].first, bounds[0].second);
-            double v_max = 0.2 * (bounds[j].second - bounds[j].first);  // Clamping at 20% of the total range
-            uniform_real_distribution<> dis_vel(-v_max, v_max);
-            swarm.back().position[j] = dis_pos(gen);
-            swarm.back().velocity[j] = dis_vel(gen);
-            swarm.back().best_position[j] = swarm.back().position[j];
-
-        }
-        swarm.back().value = objective_function(swarm.back().position, dimensions);
-        swarm.back().best_value = swarm.back().value;
-
-        if(swarm.back().value < swarm[best_index].value){
-            best_index = i;
-        }
-    }
-    copy(swarm[best_index].position, swarm[best_index].position + dimensions, algorithm.global_best_position); // Init global best position
-    algorithm.global_best_sol = swarm[best_index].value;         
-
-    /* Time profiling */
-    const auto t0 = high_resolution_clock::now();
-    
-    /* Execute PSO(function , bounds of each dim , num particles , maxiter) */
-    algorithm.pso(objective_function, dimensions, bounds, swarm, num_particles, max_iter, inertiaWeight, c1, c2);
-
-    const auto t1 = high_resolution_clock::now();
-    const auto dt = duration_cast<milliseconds>(t1 - t0).count();
-
-    /* Dealocate the bounds */
-    delete[] bounds;
-
-    /* OUTPUT */
-    ofstream file("../data/global_best_sol_history.csv");
-    for (int i = 0; i < max_iter; ++i) {
-        file << algorithm.global_best_sol_history[i] << endl;
-    }
-    file.close();
-
-
-    cout << "---------------------------Parameters----------------------------" << endl;
-    //cout << "PSO version: "<< "serial/parallel" << endl;
-    cout << "Objective function:   " << argv[4] << endl;
-    cout << "Number of dimensions: " << dimensions << endl;
-    cout << "Number of particles:  " << num_particles << endl;
-    cout << "Maximum iterations:   " << max_iter << endl;
-    cout << "\n-------------------------Hyperparameters-------------------------" << endl;
-    cout << "Constant inertia weight: " << inertiaWeight << endl;
-    cout << "Acceleration constant 1: " << c1 << endl;
-    cout << "Acceleration constant 2: " << c2 << endl;
-    cout << "\n----------------------------Solution-----------------------------" << endl;
-    cout << "Best Value     : " << algorithm.global_best_sol_history[max_iter-1] << endl;
-    cout << "Best Position  : ";
-    for (int i = 0; i < dimensions; ++i) { cout << algorithm.global_best_positions_history[max_iter-1][i] << " ";}
-    cout << endl;
-    cout <<  "\n----------------------------Profiling----------------------------" << endl;
-    cout << "Time for all iterations: " << dt << " [ms]" << " -> " << dt/1000.0 << " [s]" << " -> " << (dt/1000.0)/60.0 << " [min]" << endl;
-    cout << "Time for 1 iteration:    " << dt / max_iter << " [ms]" << endl;
-    cout << "Memory used:             " << sizeof(algorithm) << " [bytes]" << endl;
 
     return 0;
 }

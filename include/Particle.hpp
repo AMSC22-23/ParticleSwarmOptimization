@@ -1,61 +1,51 @@
 #ifndef PARTICLE_HPP
 #define PARTICLE_HPP
 
+#include <iostream>
+#include <vector>
+#include <functional>
+#include <random>
+#include <cstddef>
+
 using namespace std;
 
+template <typename T, typename Fun>
 class Particle {
 public:
-    int dimensions;        // dim of problem
-    double* position;      // position of particle
-    double* velocity;      // velocity of particle
-    double* best_position; // best position of particle
-    double value;          // value of particle at current position 
-    double best_value;     // best value of particle given a function
 
-    /* Constructor */
-    Particle(int dimensions) : dimensions(dimensions) {
-        position = new double[dimensions];
-        velocity = new double[dimensions];
-        best_position = new double[dimensions];
-    }
+    // Constructor
+    Particle(const Fun& fun, const size_t& D);
+    Particle() = default;
 
-    /* Copy constructor */
-    Particle(const Particle& other) : dimensions(other.dimensions) {
-        position = new double[dimensions];
-        velocity = new double[dimensions];
-        best_position = new double[dimensions];
-        copy(other.position, other.position + dimensions, position);
-        copy(other.velocity, other.velocity + dimensions, velocity);
-        copy(other.best_position, other.best_position + dimensions, best_position);
-        value = other.value;
-        best_value = other.best_value;
-    }
+    // Setters
+    void setPosition(const vector<T>& position);
+    void setVelocity(const vector<T>& velocity);
+    void setBestPosition(const vector<T>& best_position);
+    void setValue(const T& value);
+    void setBestValue(const T& best_value);
 
-    /* Copy operator */
-    Particle& operator=(const Particle& other) {
-        if (this != &other) {
-            delete[] position;
-            delete[] velocity;
-            delete[] best_position;
+    // Getters
+    vector<T>& getPosition();
+    vector<T>& getVelocity();
+    const vector<T>& getBestPosition() const;
+    const T& getValue() const;
+    const T& getBestValue() const;
 
-            dimensions = other.dimensions;
-            position = new double[dimensions];
-            velocity = new double[dimensions];
-            best_position = new double[dimensions];
-            copy(other.position, other.position + dimensions, position);
-            copy(other.velocity, other.velocity + dimensions, velocity);
-            copy(other.best_position, other.best_position + dimensions, best_position);
-            value = other.value;
-            best_value = other.best_value;
-        }
-        return *this;
-    }
+    // Member function
+    void info() const;
 
-    /* Destructor */ 
-    ~Particle() {
-        delete[] position;
-        delete[] velocity;
-        delete[] best_position;
-    }
+private:
+    size_t _D{2}; // Problem dimension
+
+    vector<T> _position;
+    vector<T> _velocity;
+    vector<T> _best_position;
+    T _value;
+    T _best_value;
+
+    mt19937_64 _rng{random_device{}()};
+    uniform_real_distribution<T> _dist_position{-32.0, 32.0}; // to be addressed
+    uniform_real_distribution<T> _dist_velocity{-1.0, 1.0}; // to be addressed
 };
-#endif
+
+#endif // !PARTICLE_HPP

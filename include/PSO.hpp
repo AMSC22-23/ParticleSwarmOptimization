@@ -1,63 +1,79 @@
-#ifndef PSOALGO_HPP
-#define PSOALGO_HPP
+#ifndef PSO_HPP
+#define PSO_HPP
 
+#include <iostream>
 #include <vector>
 #include <functional>
-#include "Particle.hpp"
+#include <random>
+#include <cmath>
+#include <limits>
 
-class PSO{
+using namespace std;
+
+template <typename T, typename I, typename Fun, typename Obj>
+class PSO {
 public:
-    PSO(){}
-    virtual void pso(function<double(double*, int)> objective_function,
-            const int dimensions,
-            const pair<double, double>* bounds,
-            vector<Particle> &swarm, 
-            int num_particles,
-            int max_iter, 
-            double intertiaWeight,
-            double c1, 
-            double c2) = 0; 
-};
-class PSO_serial : public PSO {
-public:
-    /* Constructor */
-    PSO_serial(int dimensions, int max_iter): PSO() {
-        this->max_iter = max_iter;
-        /* Global bests */
-        global_best_sol = std::numeric_limits<double>::max();
-        global_best_position = new double[dimensions]; 
-        /* History arrays */
-        global_best_sol_history = new double[max_iter];
-        global_best_positions_history = new double*[max_iter];
-        for(int i =0; i < max_iter; i++){
-            global_best_positions_history[i] = new double[dimensions]; 
-        }
-    }
-    /* Destructor */
-    ~PSO_serial() {
-        if (global_best_position != nullptr) {
-            delete[] global_best_position;
-        }
-        delete[] global_best_sol_history;
-        for (int i = 0; i < max_iter; i++) {
-            delete[] global_best_positions_history[i];
-        }
-        delete[] global_best_positions_history;
-    }
 
-    void pso(function<double(double*, int)> objective_function,
-            const int dimensions,
-            const pair<double, double>* bounds,
-            vector<Particle> &swarm, 
-            int num_particles,
-            int max_iter, 
-            const double intertiaWeight,
-            const double c1, const double c2) override;
+    // Constructor
+    PSO(const I& max_iter,
+        const T& tol,
+        const T& w,
+        const T& c1,
+        const T& c2,
+        const I& num_particles,
+        const Fun& fun,
+        const I& D);
+    
+    PSO();
 
-    int max_iter;
-    double global_best_sol;
-    double* global_best_position;
-    double* global_best_sol_history;
-    double** global_best_positions_history;
+    // Setters
+    void setParticles();                                    // set particles
+    void setGlobalBest(const vector<T>& gbp);               // set global best position after each iteration
+    void setExactSolution(const vector<T>& exact_solution); // set exact solution of the problem
+    void setFunction(const Fun& fun);                       // set function to minimize
+    void setNParticles(const I& num_particles);             // set number of particles
+    void setMaxIter(const I& max_iter);                     // set maximum number of iterations
+    void setW(const T& w);                                  // set inertia weight
+    void setC1(const T& c1);                                // set cognitive parameter
+    void setC2(const T& c2);                                // set social parameter
+    void setD(const I& D);                                  // set problem dimension
+    void setTol(const T& tol);                              // set tolerance
+
+    // Getters
+    const vector<Obj>& getParticles() const;
+    vector<T> getGlobalBest() const;
+    const vector<T>& getExactSolution() const;
+    const Fun& getFunction() const;
+    const I& getNParticles() const;
+    const I& getMaxIter() const;
+    const T& getW() const;
+    const T& getC1() const;
+    const T& getC2() const;
+    const I& getD() const;
+    const T& getTol() const;
+
+    // Member functions
+    void localBest(Obj& particle) const;            // auxiliary function to find the local best position of a particle within each iteration
+    void solve();                                   // PSO iteration
+    void info(const string& fun_name) const;        // print info about the PSO object
+    const T errorNorm(const vector<T>& vec) const;  // compute the error norm between the exact solution and the global best position
+
+private:
+    I _max_iter{1000};
+    T _tol{1e-6};              // tolerance
+    T _w{0.5};
+    T _c1{2.0};
+    T _c2{2.0};
+    I _num_particles{10};
+    Fun _fun;                  // function to optimize
+    I _D{2};
+
+    vector<Obj> _particles;    // objects of Particle class
+    vector<T> _gbp;            // global best position
+    vector<T> _exact_solution; // exact solution of the problem
+
+    mt19937_64 _rng{random_device{}()};
+    uniform_real_distribution<T> _dis{0.0, 1.0};
 };
+
 #endif

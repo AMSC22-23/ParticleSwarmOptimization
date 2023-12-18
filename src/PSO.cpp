@@ -1,6 +1,7 @@
 #include "PSO.hpp"
 #include "Particle.hpp"
 #include <limits>
+#include <omp.h>
 
 using namespace std;
 
@@ -115,12 +116,34 @@ const vector<Obj>& PSO<T, I, Fun, Obj>::getParticles() const
 template <typename T, typename I, typename Fun, typename Obj>
 vector<T> PSO<T, I, Fun, Obj>::getGlobalBest() const 
 {
-    size_t best_part_id = 0;
+   size_t best_part_id = 0;
     for (size_t i = 1; i < _particles.size(); ++i) {
         if (_particles[i].getBestValue() < _particles[best_part_id].getBestValue()) {
             best_part_id = i;
         }
     }
+
+//----------------------------------------------------------------------------------------------
+// Race condition when writing to best_part_id.
+// In order to avoid it, we use first have each thread compute their own best_value 
+// Then I a critical section, one thread compares the best_value of each thread and updates best_part_id
+// (The overhead of parallelizing this is not worth it)
+//----------------------------------------------------------------------------------------------
+
+/*    size_t best_part_id = 0;
+    double best_value = _particles[best_part_id].getBestValue();
+
+    #pragma omp parallel for
+    for (size_t i = 1; i < _particles.size(); ++i){
+        double temp_value = _particles[i].getBestValue();
+        #pragma omp critical 
+        {
+            if (temp_value < best_value) {
+                best_value = temp_value;
+                best_part_id = i;
+            }
+        }
+    } */
 
     vector<T> best = _particles[best_part_id].getBestPosition();
     return best;
@@ -196,6 +219,7 @@ void PSO<T, I, Fun, Obj>::solve() {
     for (I it = 0; it < _max_iter; ++it) {
         _gbp = getGlobalBest();
 
+        #pragma omp parallel for
         for (int p = 0; p < _num_particles; ++p) 
         {
             localBest(_particles[p]);

@@ -1,3 +1,5 @@
+#if defined(_OPENMP)
+
 #include <iostream>
 #include <vector>
 #include <functional>
@@ -97,3 +99,5 @@ int main()
 
     return 0;
 }
+
+#endif

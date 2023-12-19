@@ -2,13 +2,16 @@
 #include "Particle.hpp"
 #include <limits>
 #include <omp.h>
+#include <chrono>
 
+using namespace chrono;
 using namespace std;
 
 constexpr double eps = numeric_limits<double>::epsilon();
 
 template <typename T, typename I, typename Fun, typename Obj>
-PSO<T, I, Fun, Obj>::PSO(const I& max_iter,
+PSO<T, I, Fun, Obj>::PSO(const I& swarm_id, 
+                         const I& max_iter,
                          const T& tol,
                          const T& w,
                          const T& c1,
@@ -25,7 +28,15 @@ PSO<T, I, Fun, Obj>::PSO(const I& max_iter,
     , _fun(fun)
     , _D(D) 
 {
-    setParticles();
+    init(const I& swarm_id, 
+        const I& max_iter,
+        const T& tol,
+        const T& w,
+        const T& c1,
+        const T& c2,
+        const I& num_particles,
+        const Fun& fun,
+        const I& D);
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
@@ -105,6 +116,12 @@ template <typename T, typename I, typename Fun, typename Obj>
 void PSO<T, I, Fun, Obj>::setTol(const T& tol) 
 {
     _tol = tol;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::setId(const I& swarm_id) 
+{
+    _id = swarm_id;
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
@@ -204,6 +221,39 @@ const T& PSO<T, I, Fun, Obj>::getTol() const
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
+const I& PSO<T, I, Fun, Obj>::getId() const 
+{
+    return _id;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
+void PSO<T, I, Fun, Obj>::init(const I& swarm_id, 
+                               const I& max_iter,
+                               const T& tol,
+                               const T& w,
+                               const T& c1,
+                               const T& c2,
+                               const I& num_particles,
+                               const Fun& fun,
+                               const I& D) const
+{
+    cout << "\n PSO initialization ..." << endl;
+    auto start = high_resolution_clock::now();
+    setId(swarm_id);
+    setMaxIter(max_iter);
+    setTol(tol);
+    setNParticles(num_particles);
+    setFunction(fun);
+    setD(D);
+    setExactSolution(exact_solution);
+    setParticles();
+    info(functionName); // passing the function name to info method
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(stop - start);
+    cout << "\n Elapsed time for initialization: " << duration.count() << " ms" << endl;
+}
+
+template <typename T, typename I, typename Fun, typename Obj>
 void PSO<T, I, Fun, Obj>::localBest(Obj& particle) const 
 {
     particle.setValue(_fun(particle.getPosition()));
@@ -218,34 +268,39 @@ template <typename T, typename I, typename Fun, typename Obj>
 void PSO<T, I, Fun, Obj>::solve() {
     for (I it = 0; it < _max_iter; ++it) {
         _gbp = getGlobalBest();
+ 
+        omp_set_num_threads(8);
+        int num_threads=omp_get_num_threads(); 
 
-        #pragma omp parallel for
-        for (int p = 0; p < _num_particles; ++p) 
+        //#pragma omp parallel num_threads(num_threads)
         {
-            localBest(_particles[p]);
-
-            vector<T> r1, r2;
-            for (int d = 0; d < _D; ++d) 
+            #pragma omp parallel for simd schedule(static, num_threads)
+            for (int p = 0; p < _num_particles; p+=num_threads) 
             {
-                r1.emplace_back(_dis(_rng));
-                r2.emplace_back(_dis(_rng));
-            }
+                localBest(_particles[p]);
 
-            for (int d = 0; d < _D; ++d) 
-            {
-                _particles[p].getVelocity()[d] = _w * _particles[p].getVelocity()[d] +
-                                                 _c1 * r1[d] * (_particles[p].getBestPosition()[d] - _particles[p].getPosition()[d]) +
-                                                 _c2 * r2[d] * (_gbp[d] - _particles[p].getPosition()[d]);
-            }
+                vector<T> r1, r2;
+                for (int d = 0; d < _D; ++d) 
+                {
+                    r1.emplace_back(_dis(_rng));
+                    r2.emplace_back(_dis(_rng));
+                }
 
-            for (int d = 0; d < _D; ++d) 
-            {
-                _particles[p].getPosition()[d] = _particles[p].getPosition()[d] + _particles[p].getVelocity()[d];
-            }
+                for (int d = 0; d < _D; ++d) 
+                {
+                    _particles[p].getVelocity()[d] = _w * _particles[p].getVelocity()[d] +
+                                                    _c1 * r1[d] * (_particles[p].getBestPosition()[d] - _particles[p].getPosition()[d]) +
+                                                    _c2 * r2[d] * (_gbp[d] - _particles[p].getPosition()[d]);
+                }
 
-            localBest(_particles[p]);
+                for (int d = 0; d < _D; ++d) 
+                {
+                    _particles[p].getPosition()[d] = _particles[p].getPosition()[d] + _particles[p].getVelocity()[d];
+                }
+
+                localBest(_particles[p]);
+            }
         }
-
         vector<T> gbp_new = getGlobalBest();
 
         if (_fun(gbp_new) < _fun(_gbp))

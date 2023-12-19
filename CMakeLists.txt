@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(OpenMP)
 
-
 if(OpenMP_CXX_FOUND)
     message("-- OpenMP was found")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 ${OpenMP_CXX_FLAGS}")

@@ -17,67 +17,47 @@ Particle<T, Fun>::Particle(const Fun& fun, const size_t& D) : _D(D)
 
 template <typename T, typename Fun>
 void Particle<T, Fun>::setPosition(const vector<T>& position) 
-{
-    _position = position;
-}
+{    _position = position;}
 
 template <typename T, typename Fun>
 void Particle<T, Fun>::setVelocity(const vector<T>& velocity) 
-{
-    _velocity = velocity;
-}
+{    _velocity = velocity;}
 
 template <typename T, typename Fun>
 void Particle<T, Fun>::setBestPosition(const vector<T>& best_position) 
-{
-    _best_position = best_position;
-}
+{    _best_position = best_position;}
 
 template <typename T, typename Fun>
 void Particle<T, Fun>::setValue(const T& value) 
-{
-    _value = value;
-}
+{    _value = value;}
 
 template <typename T, typename Fun>
 void Particle<T, Fun>::setBestValue(const T& best_value) 
-{
-    _best_value = best_value;
-}
+{    _best_value = best_value;}
 
 template <typename T, typename Fun>
 vector<T>& Particle<T, Fun>::getPosition() 
-{
-    return _position;
-}
+{    return _position;}
 
 template <typename T, typename Fun>
 vector<T>& Particle<T, Fun>::getVelocity() 
-{
-    return _velocity;
-}
+{    return _velocity;}
 
 template <typename T, typename Fun>
 const vector<T>& Particle<T, Fun>::getBestPosition() const 
-{
-    return _best_position;
-}
+{    return _best_position;}
 
 template <typename T, typename Fun>
 const T& Particle<T, Fun>::getValue() const 
-{
-    return _value;
-}
+{    return _value;}
 
 template <typename T, typename Fun>
 const T& Particle<T, Fun>::getBestValue() const 
-{
-    return _best_value;
-}
+{    return _best_value;}
 
 template <typename T, typename Fun>
 void Particle<T, Fun>::info() const 
-{
+{    
     cout << "Position     : ";
     for (const auto& elem : _position) {
         cout << elem << " ";

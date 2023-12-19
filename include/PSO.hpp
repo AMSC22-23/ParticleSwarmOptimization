@@ -15,7 +15,8 @@ class PSO {
 public:
 
     // Constructor
-    PSO(const I& max_iter,
+    PSO(const I& swarm_id,
+        const I& max_iter,
         const T& tol,
         const T& w,
         const T& c1,
@@ -38,6 +39,7 @@ public:
     void setC2(const T& c2);                                // set social parameter
     void setD(const I& D);                                  // set problem dimension
     void setTol(const T& tol);                              // set tolerance
+    void setId(const I& swarm_id);                          // set swarm id
 
     // Getters
     const vector<Obj>& getParticles() const;
@@ -51,12 +53,22 @@ public:
     const T& getC2() const;
     const I& getD() const;
     const T& getTol() const;
+    const I& getId() const;
 
     // Member functions
     void localBest(Obj& particle) const;            // auxiliary function to find the local best position of a particle within each iteration
     void solve();                                   // PSO iteration
     void info(const string& fun_name) const;        // print info about the PSO object
     const T errorNorm(const vector<T>& vec) const;  // compute the error norm between the exact solution and the global best position
+    void init(const I& swarm_id, 
+              const I& max_iter,
+              const T& tol,
+              const T& w,
+              const T& c1,
+              const T& c2,
+              const I& num_particles,
+              const Fun& fun,
+              const I& D) const;   // init the swarm
 
 private:
     I _max_iter{1000};
@@ -67,6 +79,7 @@ private:
     I _num_particles{10};
     Fun _fun;                  // function to optimize
     I _D{2};
+    I _id{0};                  // swarm id
 
     vector<Obj> _particles;    // objects of Particle class
     vector<T> _gbp;            // global best position

@@ -18,7 +18,8 @@ PSO<T, I, Fun, Obj>::PSO(const I& swarm_id,
                          const T& c2,
                          const I& num_particles,
                          const Fun& fun,
-                         const I& D)
+                         const I& D,
+                         const vector<T>& exact_solution)
     : _max_iter(max_iter)
     , _tol(tol)
     , _w(w)
@@ -26,19 +27,12 @@ PSO<T, I, Fun, Obj>::PSO(const I& swarm_id,
     , _c2(c2)
     , _num_particles(num_particles)
     , _fun(fun)
-    , _D(D) 
+    , _D(D)
+    , _id(swarm_id)
+    , _exact_solution(exact_solution)
 {
-    init(const I& swarm_id, 
-        const I& max_iter,
-        const T& tol,
-        const T& w,
-        const T& c1,
-        const T& c2,
-        const I& num_particles,
-        const Fun& fun,
-        const I& D);
+init(swarm_id, max_iter, tol, w, c1, c2, num_particles, fun, D, exact_solution);
 }
-
 template <typename T, typename I, typename Fun, typename Obj>
 PSO<T, I, Fun, Obj>::PSO() 
 {
@@ -235,7 +229,8 @@ void PSO<T, I, Fun, Obj>::init(const I& swarm_id,
                                const T& c2,
                                const I& num_particles,
                                const Fun& fun,
-                               const I& D) const
+                               const I& D, 
+                               const vector<T>& exact_solution)
 {
     cout << "\n PSO initialization ..." << endl;
     auto start = high_resolution_clock::now();
@@ -245,9 +240,9 @@ void PSO<T, I, Fun, Obj>::init(const I& swarm_id,
     setNParticles(num_particles);
     setFunction(fun);
     setD(D);
-    setExactSolution(exact_solution);
+    setExactSolution(_exact_solution);
     setParticles();
-    info(functionName); // passing the function name to info method
+    //info(functionName); // passing the function name to info method
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
     cout << "\n Elapsed time for initialization: " << duration.count() << " ms" << endl;

@@ -14,44 +14,6 @@ namespace Function {
     constexpr double bA = 0.2;  // Ackley function parameter
     constexpr double cA = 2 * M_PI; // Ackley function parameter
 
-    template <typename Fun>
-    Fun getFun(string functionName)
-    {
-        vector<double> exact_solution; // exact solution of the problem
-        
-        if (functionName == "1")
-            {
-                for (size_t i = 0; i < D; ++i)
-                    exact_solution.emplace_back(1.0);
-                return Function::Rosenbrock<double>, exact_solution;
-            } else if (functionName == "2")
-            {
-                for (size_t i = 0; i < D; ++i)
-                    exact_solution.emplace_back(0.0);
-                return Function::Sphere<double>, exact_solution;
-            } else if (functionName == "3")
-            {
-                for (size_t i = 0; i < D; ++i)
-                    exact_solution.emplace_back(0.0);
-                return Function::Ackley<double>, exact_solution;
-            } else if (functionName == "4")
-            {
-                for (size_t i = 0; i < D; ++i)
-                    exact_solution.emplace_back(0.0);
-                return Function::Griewank<double>, exact_solution;
-            } else if (functionName == "5")
-            {
-                for (size_t i = 0; i < D; ++i)
-                    exact_solution.emplace_back(0.0);
-                return Function::Rastrigin<double>, exact_solution;
-            }
-            else
-            {
-                cerr << "Invalid function name. Exiting." << endl;
-                exit(1);
-            }
-    }
-
     template <typename T>
     T Rosenbrock(const vector<T>& x) // most difficult function, suitable for testing flatness of the regione of global minima
     {

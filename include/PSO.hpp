@@ -23,7 +23,8 @@ public:
         const T& c2,
         const I& num_particles,
         const Fun& fun,
-        const I& D);
+        const I& D,
+        const vector<T>& exact_solution);
     
     PSO();
 
@@ -68,18 +69,19 @@ public:
               const T& c2,
               const I& num_particles,
               const Fun& fun,
-              const I& D) const;   // init the swarm
+              const I& D,
+              const vector<T>& exact_solution);   // init the swarm
 
 private:
     I _max_iter{1000};
-    T _tol{1e-6};              // tolerance
+    T _tol{1e-6};
     T _w{0.5};
     T _c1{2.0};
     T _c2{2.0};
     I _num_particles{10};
-    Fun _fun;                  // function to optimize
+    Fun _fun;
     I _D{2};
-    I _id{0};                  // swarm id
+    I _id{0};
 
     vector<Obj> _particles;    // objects of Particle class
     vector<T> _gbp;            // global best position

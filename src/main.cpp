@@ -74,15 +74,17 @@ int main()
     cin >> num_particles;
 
     vector<PSOType> master;
-    #pragma omp parallel num_threads(3)
-    {
+    
         #pragma omp parallel for schedule(static)
         for (int sub_swarm_id=0; sub_swarm_id < 3; ++sub_swarm_id)
         {
             cout<<"\n sub-swarm "<<sub_swarm_id<<" init ... "<< endl;
             PSOType pso;
             pso.init(sub_swarm_id,max_iter, tol, 0.5, 2.0, 2.0, num_particles, fun, D, exact_solution);
-            master.emplace_back(pso);
+            #pragma omp critical
+            {
+                master.emplace_back(pso);
+            }
         }
 
         cout << "\n============================================="
@@ -91,12 +93,15 @@ int main()
             << "\n---------------------------------------------"
             << "\n=============================================" << endl;
         vector<double> list_results;
-    }      
-    #pragma omp parallel num_threads(3)
-    {
-        #pragma omp parallel for schedule(static)
-        for (PSOType sub_swarm : master)
+        
+        #pragma omp barrier
+
+        cout << "length of master: " << master.size() << endl;
+
+        #pragma omp parallel for schedule(static) 
+        for (int i =0; i < master.size(); ++i)
         {
+            PSOType& sub_swarm = master[i];
             cout << "\n PSO solving for swarm "<< sub_swarm.getId() << " ..." << endl;
             auto start = high_resolution_clock::now();
             double result = sub_swarm.solve();
@@ -105,7 +110,7 @@ int main()
             auto duration = duration_cast<milliseconds>(stop - start);
             cout << "\n Elapsed time for solving: " << duration.count() << " ms" << endl;
         }
-    }
+    #pragma omp barrier
     return 0;
 }
 

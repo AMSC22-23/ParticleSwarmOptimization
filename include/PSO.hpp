@@ -58,7 +58,7 @@ public:
 
     // Member functions
     void localBest(Obj& particle) const;            // auxiliary function to find the local best position of a particle within each iteration
-    void solve();                                   // PSO iteration
+    const T solve();                                   // PSO iteration
     void info(const string& fun_name) const;        // print info about the PSO object
     const T errorNorm(const vector<T>& vec) const;  // compute the error norm between the exact solution and the global best position
     void init(const I& swarm_id, 

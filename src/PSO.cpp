@@ -36,11 +36,7 @@ init(swarm_id, max_iter, tol, w, c1, c2, num_particles, fun, D, exact_solution);
 template <typename T, typename I, typename Fun, typename Obj>
 PSO<T, I, Fun, Obj>::PSO() 
 {
-    cout << "\n============================================="
-              << "\n---------------------------------------------"
-              << "\n               PSO algorithm                 " 
-              << "\n---------------------------------------------"
-              << "\n=============================================" << endl;
+
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
@@ -245,7 +241,7 @@ void PSO<T, I, Fun, Obj>::init(const I& swarm_id,
     //info(functionName); // passing the function name to info method
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
-    cout << "\n Elapsed time for initialization: " << duration.count() << " ms" << endl;
+    cout << "\n" << duration.count() << " ms for initialization" << endl;
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
@@ -260,16 +256,16 @@ void PSO<T, I, Fun, Obj>::localBest(Obj& particle) const
 }
 
 template <typename T, typename I, typename Fun, typename Obj>
-void PSO<T, I, Fun, Obj>::solve() {
+const T PSO<T, I, Fun, Obj>::solve() {
     for (I it = 0; it < _max_iter; ++it) {
         _gbp = getGlobalBest();
  
         omp_set_num_threads(8);
         int num_threads=omp_get_num_threads(); 
 
-        #pragma omp parallel num_threads(num_threads)
-        {
-            #pragma omp parallel for simd schedule(static, num_threads)
+        //#pragma omp parallel num_threads(num_threads)
+        //{
+            #pragma omp parallel for schedule(static)
             for (int p = 0; p < _num_particles; p+=num_threads) 
             {
                 localBest(_particles[p]);
@@ -295,7 +291,7 @@ void PSO<T, I, Fun, Obj>::solve() {
 
                 localBest(_particles[p]);
             }
-        }
+        //}
         vector<T> gbp_new = getGlobalBest();
 
         if (_fun(gbp_new) < _fun(_gbp))
@@ -311,13 +307,14 @@ void PSO<T, I, Fun, Obj>::solve() {
         if (errorNorm(_gbp) < _tol)
         {
             cout << "\n Convergence achieved in " << it + 1 << " iterations" << endl;
-            break;
+            return gbp_new.back();
         };
 
         if (it == _max_iter - 1)
         {
             cout << "\n Maximum number of iterations reached" << endl;
             cout << "\n Tolerance achieved: " << errorNorm(_gbp) << endl;
+            return gbp_new.back();
         }
     }
 }

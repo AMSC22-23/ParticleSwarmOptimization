@@ -24,7 +24,7 @@ int main()
 
     cout << "\nEnter the function name:\n 1-Rosenbrock (HARD, flat global minimun region) \n 2-Sphere (EASY) \n 3-Ackley (MEDIUM, many local minima)\n 4-Griewank (VERY HARD, many local minima) \n 5-Rastrigin (VERY HARD, many local minima)\n\n ";
     cin >> functionName;
-    
+
     function<double(const vector<double>&)> fun;
     using ParticleType = Particle<double, decltype(fun)>;
     using PSOType = PSO<double, int, decltype(fun), ParticleType>;
@@ -83,7 +83,7 @@ int main()
     }
     for (PSOType sub_swarm : master)
     {
-        cout << "\n PSO solving ..." << endl;
+        cout << "\n PSO solving for swarm "<< sub_swarm.getId() << " ..." << endl;
         auto start = high_resolution_clock::now();
         sub_swarm.solve();
         auto stop = high_resolution_clock::now();

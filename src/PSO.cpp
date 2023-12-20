@@ -240,7 +240,7 @@ void PSO<T, I, Fun, Obj>::init(const I& swarm_id,
     setNParticles(num_particles);
     setFunction(fun);
     setD(D);
-    setExactSolution(_exact_solution);
+    setExactSolution(exact_solution);
     setParticles();
     //info(functionName); // passing the function name to info method
     auto stop = high_resolution_clock::now();
@@ -267,7 +267,7 @@ void PSO<T, I, Fun, Obj>::solve() {
         omp_set_num_threads(8);
         int num_threads=omp_get_num_threads(); 
 
-        //#pragma omp parallel num_threads(num_threads)
+        #pragma omp parallel num_threads(num_threads)
         {
             #pragma omp parallel for simd schedule(static, num_threads)
             for (int p = 0; p < _num_particles; p+=num_threads) 

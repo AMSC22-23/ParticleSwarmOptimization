@@ -74,32 +74,37 @@ int main()
     cin >> num_particles;
 
     vector<PSOType> master;
-
-    #pragma omp parallel for schedule(static)
-    for (int sub_swarm_id=0; sub_swarm_id < 3; ++sub_swarm_id)
+    #pragma omp parallel num_threads(3)
     {
-        cout<<"\n sub-swarm "<<sub_swarm_id<<" init ... "<< endl;
-        PSOType pso;
-        pso.init(sub_swarm_id,max_iter, tol, 0.5, 2.0, 2.0, num_particles, fun, D, exact_solution);
-        master.emplace_back(pso);
-    }
+        #pragma omp parallel for schedule(static)
+        for (int sub_swarm_id=0; sub_swarm_id < 3; ++sub_swarm_id)
+        {
+            cout<<"\n sub-swarm "<<sub_swarm_id<<" init ... "<< endl;
+            PSOType pso;
+            pso.init(sub_swarm_id,max_iter, tol, 0.5, 2.0, 2.0, num_particles, fun, D, exact_solution);
+            master.emplace_back(pso);
+        }
 
-    cout << "\n============================================="
-         << "\n---------------------------------------------"
-         << "\n               PSO algorithm                 " 
-         << "\n---------------------------------------------"
-         << "\n=============================================" << endl;
-    vector<double> list_results;
-    #pragma omp parallel for schedule(static)
-    for (PSOType sub_swarm : master)
+        cout << "\n============================================="
+            << "\n---------------------------------------------"
+            << "\n               PSO algorithm                 " 
+            << "\n---------------------------------------------"
+            << "\n=============================================" << endl;
+        vector<double> list_results;
+    }      
+    #pragma omp parallel num_threads(3)
     {
-        cout << "\n PSO solving for swarm "<< sub_swarm.getId() << " ..." << endl;
-        auto start = high_resolution_clock::now();
-        double result = sub_swarm.solve();
-        auto stop = high_resolution_clock::now();
-        cout << "\n Swarm " << sub_swarm.getId() << " result: " << result << endl;
-        auto duration = duration_cast<milliseconds>(stop - start);
-        cout << "\n Elapsed time for solving: " << duration.count() << " ms" << endl;
+        #pragma omp parallel for schedule(static)
+        for (PSOType sub_swarm : master)
+        {
+            cout << "\n PSO solving for swarm "<< sub_swarm.getId() << " ..." << endl;
+            auto start = high_resolution_clock::now();
+            double result = sub_swarm.solve();
+            auto stop = high_resolution_clock::now();
+            cout << "\n Swarm " << sub_swarm.getId() << " result: " << result << endl;
+            auto duration = duration_cast<milliseconds>(stop - start);
+            cout << "\n Elapsed time for solving: " << duration.count() << " ms" << endl;
+        }
     }
     return 0;
 }

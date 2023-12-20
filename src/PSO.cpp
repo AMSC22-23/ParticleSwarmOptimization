@@ -262,36 +262,34 @@ const T PSO<T, I, Fun, Obj>::solve() {
  
         omp_set_num_threads(8);
         int num_threads=omp_get_num_threads(); 
+        
+        #pragma omp parallel for schedule(static)
+        for (int p = 0; p < _num_particles; p+=num_threads) 
+        {
+            localBest(_particles[p]);
 
-        //#pragma omp parallel num_threads(num_threads)
-        //{
-            #pragma omp parallel for schedule(static)
-            for (int p = 0; p < _num_particles; p+=num_threads) 
+            vector<T> r1, r2;
+            for (int d = 0; d < _D; ++d) 
             {
-                localBest(_particles[p]);
-
-                vector<T> r1, r2;
-                for (int d = 0; d < _D; ++d) 
-                {
-                    r1.emplace_back(_dis(_rng));
-                    r2.emplace_back(_dis(_rng));
-                }
-
-                for (int d = 0; d < _D; ++d) 
-                {
-                    _particles[p].getVelocity()[d] = _w * _particles[p].getVelocity()[d] +
-                                                    _c1 * r1[d] * (_particles[p].getBestPosition()[d] - _particles[p].getPosition()[d]) +
-                                                    _c2 * r2[d] * (_gbp[d] - _particles[p].getPosition()[d]);
-                }
-
-                for (int d = 0; d < _D; ++d) 
-                {
-                    _particles[p].getPosition()[d] = _particles[p].getPosition()[d] + _particles[p].getVelocity()[d];
-                }
-
-                localBest(_particles[p]);
+                r1.emplace_back(_dis(_rng));
+                r2.emplace_back(_dis(_rng));
             }
-        //}
+
+            for (int d = 0; d < _D; ++d) 
+            {
+                _particles[p].getVelocity()[d] = _w * _particles[p].getVelocity()[d] +
+                                                _c1 * r1[d] * (_particles[p].getBestPosition()[d] - _particles[p].getPosition()[d]) +
+                                                _c2 * r2[d] * (_gbp[d] - _particles[p].getPosition()[d]);
+            }
+
+            for (int d = 0; d < _D; ++d) 
+            {
+                _particles[p].getPosition()[d] = _particles[p].getPosition()[d] + _particles[p].getVelocity()[d];
+            }
+
+            localBest(_particles[p]);
+        }
+        
         vector<T> gbp_new = getGlobalBest();
 
         if (_fun(gbp_new) < _fun(_gbp))

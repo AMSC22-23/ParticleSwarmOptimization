@@ -2,6 +2,8 @@
 #define FUNCTIONS_HPP
 
 #include <string>
+#include <vector>
+#include <cmath>
 
 using namespace std;
 

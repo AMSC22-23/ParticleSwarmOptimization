@@ -123,12 +123,28 @@ const vector<Obj>& PSO<T, I, Fun, Obj>::getParticles() const
 template <typename T, typename I, typename Fun, typename Obj>
 vector<T> PSO<T, I, Fun, Obj>::getGlobalBest() const 
 {
+    omp_set_num_threads(8);
+    int num_threads=omp_get_num_threads(); 
    size_t best_part_id = 0;
+
+    double start_time = omp_get_wtime();
+   # pragma omp parallel for num_threads(num_threads) reduction(+:best_part_id)
     for (size_t i = 1; i < _particles.size(); ++i) {
+        
+        #pragma omp critical
+        {
         if (_particles[i].getBestValue() < _particles[best_part_id].getBestValue()) {
             best_part_id = i;
+          //  #pragma omp critical
+          //  std::cout << "Thread " << omp_get_thread_num() << ": Partial Sum = " << best_part_id << std::endl;
         }
+        }
+        
     }
+    double end_time = omp_get_wtime();
+    double elapsed_time = end_time - start_time;
+
+    //vstd::cout << "Parallel Execution Time: " << elapsed_time << " seconds" << std::endl;
 
 //----------------------------------------------------------------------------------------------
 // Race condition when writing to best_part_id.
@@ -228,7 +244,6 @@ void PSO<T, I, Fun, Obj>::init(const I& swarm_id,
                                const I& D, 
                                const vector<T>& exact_solution)
 {
-    cout << "\n PSO initialization ..." << endl;
     auto start = high_resolution_clock::now();
     setId(swarm_id);
     setMaxIter(max_iter);
@@ -262,10 +277,12 @@ const T PSO<T, I, Fun, Obj>::solve() {
  
         omp_set_num_threads(8);
         int num_threads=omp_get_num_threads(); 
-        
-        #pragma omp parallel for schedule(static)
+        #pragma omp parallel num_threads(num_threads) default(shared)
         for (int p = 0; p < _num_particles; p+=num_threads) 
         {
+
+        #pragma omp critical 
+        {    
             localBest(_particles[p]);
 
             vector<T> r1, r2;
@@ -287,8 +304,13 @@ const T PSO<T, I, Fun, Obj>::solve() {
                 _particles[p].getPosition()[d] = _particles[p].getPosition()[d] + _particles[p].getVelocity()[d];
             }
 
+
             localBest(_particles[p]);
+        }    
+
+
         }
+
         
         vector<T> gbp_new = getGlobalBest();
 
@@ -304,7 +326,7 @@ const T PSO<T, I, Fun, Obj>::solve() {
 
         if (errorNorm(_gbp) < _tol)
         {
-            cout << "\n Convergence achieved in " << it + 1 << " iterations" << endl;
+            cout << "\n Swarm "<< _id << " --> Convergence achieved in " << it + 1 << " iterations" << endl;
             return gbp_new.back();
         };
 
@@ -319,6 +341,9 @@ const T PSO<T, I, Fun, Obj>::solve() {
 
 template <typename T, typename I, typename Fun, typename Obj>
 void PSO<T, I, Fun, Obj>::info(const string& fun_name) const {
+    cout << "\n============================================="
+    << "\n               PSO algorithm                 " 
+    << "\n=============================================" << endl;  
     cout << "\n=============================================" << endl;
     cout << " Function            : " << fun_name << endl;
     cout << " Problem Dimension   : " << _D << endl;

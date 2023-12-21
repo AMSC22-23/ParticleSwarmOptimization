@@ -64,7 +64,7 @@ int main()
         return 1;
     }
 
-    size_t max_iter, num_particles;
+    size_t max_iter, num_particles, num_sswarms;
     double tol;
     cout << "\nEnter the maximum number of iterations:\n\n ";
     cin >> max_iter;
@@ -72,13 +72,16 @@ int main()
     cin >> tol;
     cout << "\nEnter the number of particles: \n\n ";
     cin >> num_particles;
+    cout << "\nEnter the number of sub-swarms: \n\n ";
+    cin >> num_sswarms;
 
     vector<PSOType> master;
-    
-        #pragma omp parallel for schedule(static)
-        for (int sub_swarm_id=0; sub_swarm_id < 3; ++sub_swarm_id)
+
+    #pragma omp parallel
+    {
+        #pragma omp for 
+        for (int sub_swarm_id=0; sub_swarm_id < num_sswarms; ++sub_swarm_id)
         {
-            cout<<"\n sub-swarm "<<sub_swarm_id<<" init ... "<< endl;
             PSOType pso;
             pso.init(sub_swarm_id,max_iter, tol, 0.5, 2.0, 2.0, num_particles, fun, D, exact_solution);
             #pragma omp critical
@@ -86,32 +89,22 @@ int main()
                 master.emplace_back(pso);
             }
         }
-
-        cout << "\n============================================="
-            << "\n---------------------------------------------"
-            << "\n               PSO algorithm                 " 
-            << "\n---------------------------------------------"
-            << "\n=============================================" << endl;
-        vector<double> list_results;
-        
+    }
         #pragma omp barrier
-
-        cout << "length of master: " << master.size() << endl;
-
-        #pragma omp parallel for schedule(static) 
-        for (int i =0; i < master.size(); ++i)
+        #pragma omp critical 
+        { 
+            master[0].info(functionName);
+        }    
+        #pragma omp for schedule(dynamic) 
+        for (int i=0; i < master.size(); ++i)
         {
             PSOType& sub_swarm = master[i];
-            cout << "\n PSO solving for swarm "<< sub_swarm.getId() << " ..." << endl;
             auto start = high_resolution_clock::now();
-            double result = sub_swarm.solve();
+            sub_swarm.solve();
             auto stop = high_resolution_clock::now();
-            cout << "\n Swarm " << sub_swarm.getId() << " result: " << result << endl;
             auto duration = duration_cast<milliseconds>(stop - start);
-            cout << "\n Elapsed time for solving: " << duration.count() << " ms" << endl;
         }
     #pragma omp barrier
     return 0;
 }
-
 #endif

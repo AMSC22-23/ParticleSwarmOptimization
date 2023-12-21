@@ -80,6 +80,18 @@ namespace Function {
         }
         return result;
     }
+
+    template <typename T>
+        T Shaffer(const std::vector<T>& x)
+        {
+            T term = 0;
+            for (size_t i = 0; i < x.size(); ++i) {
+                term += x[i] * x[i];
+            }
+            T result = 0.5 + (std::sin(std::sqrt(term)) * std::sin(std::sqrt(term)) - 0.5) / ((1 + 0.001 * term) * (1 + 0.001 * term));
+            return result;
+        }
 }
+
 
 #endif

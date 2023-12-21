@@ -23,7 +23,7 @@ int main()
 
     string functionName;
 
-    cout << "\nEnter the function name:\n 1-Rosenbrock (HARD, flat global minimun region) \n 2-Sphere (EASY) \n 3-Ackley (MEDIUM, many local minima)\n 4-Griewank (VERY HARD, many local minima) \n 5-Rastrigin (VERY HARD, many local minima)\n\n ";
+    cout << "\nEnter the function name:\n 1-Rosenbrock (HARD, flat global minimun region) \n 2-Sphere (EASY) \n 3-Ackley (MEDIUM, many local minima)\n 4-Griewank (VERY HARD, many local minima) \n 5-Rastrigin (VERY HARD, many local minima)\n 6-Shaffer [Original-problem] (VERY VERY VERY HARD, many local minima)\n\n ";
     cin >> functionName;
 
     function<double(const vector<double>&)> fun;
@@ -55,6 +55,11 @@ int main()
     } else if (functionName == "5")
     {
         fun = Function::Rastrigin<double>;
+        for (size_t i = 0; i < D; ++i)
+            exact_solution.emplace_back(0.0);
+    } else if (functionName == "6")
+    {
+        fun = Function::Shaffer<double>;
         for (size_t i = 0; i < D; ++i)
             exact_solution.emplace_back(0.0);
     }

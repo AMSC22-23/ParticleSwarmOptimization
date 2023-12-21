@@ -77,33 +77,29 @@ int main()
 
     vector<PSOType> master;
 
-    #pragma omp parallel
+    #pragma omp parallel for 
+    for (int sub_swarm_id=0; sub_swarm_id < num_sswarms; ++sub_swarm_id)
     {
-        #pragma omp for 
-        for (int sub_swarm_id=0; sub_swarm_id < num_sswarms; ++sub_swarm_id)
+        PSOType pso;
+        pso.init(sub_swarm_id,max_iter, tol, 0.5, 2.0, 2.0, num_particles, fun, D, exact_solution);
+        #pragma omp critical
         {
-            PSOType pso;
-            pso.init(sub_swarm_id,max_iter, tol, 0.5, 2.0, 2.0, num_particles, fun, D, exact_solution);
-            #pragma omp critical
-            {
-                master.emplace_back(pso);
-            }
+            master.emplace_back(pso);
         }
     }
-        #pragma omp barrier
-        #pragma omp critical 
-        { 
-            master[0].info(functionName);
-        }    
-        #pragma omp for schedule(dynamic) 
-        for (int i=0; i < master.size(); ++i)
-        {
-            PSOType& sub_swarm = master[i];
-            auto start = high_resolution_clock::now();
-            sub_swarm.solve();
-            auto stop = high_resolution_clock::now();
-            auto duration = duration_cast<milliseconds>(stop - start);
-        }
+    #pragma omp barrier
+
+    master[0].info(functionName); 
+
+    #pragma omp parallel for num_threads(num_sswarms)
+    for (int i=0; i < master.size(); ++i)
+    {
+        PSOType& sub_swarm = master[i];
+        auto start = high_resolution_clock::now();
+        sub_swarm.solve();
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<milliseconds>(stop - start);
+    }
     #pragma omp barrier
     return 0;
 }

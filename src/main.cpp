@@ -104,6 +104,7 @@ int main()
         sub_swarm.solve();
         auto stop = high_resolution_clock::now();
         auto duration = duration_cast<milliseconds>(stop - start);
+        cout << "\nElapsed time : " << duration.count() << " ms" << endl;
     }
     #pragma omp barrier
     return 0;

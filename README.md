@@ -11,7 +11,9 @@ When a particle takes part of the swarm into consideration, it is a local best v
 
 We have the following update rules for the position and the velocity at a given time step $t$ and for a given particle $i$:
 
-$$v^{t+1}_{i}=\underbrace{w*v^{t}_{i}}_{\text{inertia component}}*\underbrace{c1*r1*(pBest^{t}_{i}-x^{t}_{i})}_{\text{cognitive component}}*\underbrace{c2*r2*(gBest^{t}_{i}- x^{t}_{i})}_{\text{social component}}$$
+$$v^{t+1}_{i}=\underbrace{w*v^{t}_{i}}_{\text{inertia component}}$$
+$$*\underbrace{c1*r1*(pBest^{t}_{i}-x^{t}_{i})}_{\text{cognitive component}}$$
+$$*\underbrace{c2*r2*(gBest^{t}_{i}- x^{t}_{i})}_{\text{social component}}$$
 
 and the position update rule:
 
@@ -46,8 +48,6 @@ We tested our PSO implementation on several benchmark functions. As said previou
 
 - Rastrigin: has a single minimum of 0 at $[0,0,...,0,0]^{D}$
 $$F(x) = \sum^{D}_{d=1}{x^{[d]2} - 10 * cos(2 \pi x^{[d]}) + 10}$$
-  
-![plot](https://github.com/nncmxbc/ParticleSwarmOptimisation/../../../../visualization/readme_img/Rastrigin_function.png)
 
 The Rastrigin function has many local minimums which can be a good benchmark of the capacity of the algorithm to recognize these local minimas. 
 
@@ -60,8 +60,6 @@ The Rosenbrock function is a very difficult function to optimize due to its larg
 - Ackley function has a minimum of 0 at $[0,0,...,0,0]^{D}$
 
 $$F(x)= -20 * exp( -0.2 * \sqrt{ \frac{1}{D} \sum^{D}_{d=1}x^{[D]2} }) - exp(\frac{1}{D} \sum^{D}_{d=1} cos(2\pi x^{[d]}))+ 20 + exp(1)$$
-
-![plot](https://github.com/nncmxbc/ParticleSwarmOptimisation/../../../../visualization/readme_img/Ackley.jpeg)
 
 - Griewank is similar to the rastrigin function 
 

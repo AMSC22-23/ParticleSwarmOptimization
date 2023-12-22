@@ -63,10 +63,7 @@ $$F(x)= -20 * exp( -0.2 * \sqrt{ \frac{1}{D} \sum^{D}_{d=1}x^{[D]2} }) - exp(\fr
 
 $$F(x)= \sum^{D}_{d=1} \frac{x^{[D]2}}{4000} - \prod^{D}_{d=1}cos(\frac{x^{[d]}}{\sqrt{1}})+1$$
 
-## 5.Results
-
-
-## 6. Dependencies and build
+## 5. Dependencies and build
 This project requires `CMake` for building the project and `openMP` in order to enable the CPU parallelism.
 In the case `openMP` is not installed or not found the project will still compile and run, only in fully serial manner.   
 
